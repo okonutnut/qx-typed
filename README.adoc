@@ -1,0 +1,69 @@
+= QX Typed
+:icons: font
+
+== Introduction
+This is a small demo application that demonstrates how you can easily use qooxdoo from
+a TypeScript project. This application can also serve as a template to build your own application.
+
+The easiest way is to try it out and get started is:
+
+== How to get started
+All you really need to do is implement a function with the following signature: 
+
+----
+someFunctionName(app: qx.application.Standalone): void
+----
+
+and then register it:
+
+----
+qx.registry.registerMainMethod(someFunctionName);
+----
+
+Within this function you can use all the qooxdoo widgets you like and it is behaves just like a normal qooxdoo application. The benefit is that because of TypeScript you get all kind of benefits like code completion, type checking and easy navigation.
+You can use the provided application (application.ts) as an template to see how to create some simple widgets. 
+
+
+To compile your code after editing (assuming you have installed TypeScript) and then see your application in action, use the following two commands:
+----
+tsc
+npx http-server
+----
+
+
+== Tips & Tricks
+There might be a cases where the declaration file doesn't cover all possible use cases, typically because qooxdoo doesn't always follow sound OO principles. 
+But if you encounter such scenario, it is easy to work around them:
+
+----
+// Produces error because c() is unknown
+const x = a.b().c() 
+
+// Work around
+const b = a.b() as any
+b.c()
+----
+
+
+If you don't want to enter the fully qualified name, you can import it:
+
+----
+import Button = qx.ui.form.Button
+const b1 = Button("label 1")
+const b2 = Button("label 2")
+const b3 = Button("label 2")
+----
+
+
+== License
+This application uses much of qooxdoo and for those part the same license applies as qooxdoo. So either LGPL or EPL.
+See also qooxdoo.org for more details.
+
+For the remaining part the Apache License is applicable (mainly the qooxdoo.d.ts file).
+
+== Donate
+Donations are very welcome. Using the link below, you can make a one-time or recurring donation:
+
+image:https://img.shields.io/badge/Sponsor_this_Project-blue.svg?style=for-the-badge&logo=githubsponsors[link=https://github.com/sponsors/jbaron?o=sd&sc=t]
+
+And let us know if you or your company would like to be listed as a sponsor.

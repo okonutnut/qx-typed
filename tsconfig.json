@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "module": "amd",
+    "target": "ES6",
+    "preserveConstEnums": true,
+    "outFile": "lib/application.js",
+
+    "moduleResolution": "node",
+    "lib": ["DOM", "ES2015"],
+    "types": []
+  },
+  "include": ["src/**/*"]
+}

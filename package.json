@@ -1,0 +1,23 @@
+{
+  "name": "base",
+  "version": "5.0.1",
+  "main": "index.html",
+  "repository": {},
+  "dependencies": {
+    "http-server": "^14.1.1",
+    "lucide-static": "^0.575.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w --preserveWatchOutput",
+    "serve:php": "php -S localhost:8080",
+    "serve:reload": "browser-sync start --proxy \"localhost:8080\" --files \"lib/application.js, **/*.html, source/**/*.css\" --no-open",
+    "dev": "concurrently -k \"npm:watch\" \"npm:serve:php\" \"npm:serve:reload\""
+  },
+  "devDependencies": {
+    "browser-sync": "^3.0.4",
+    "concurrently": "^9.2.1",
+    "typescript": "^5.9.3",
+    "undici-types": "^7.22.0"
+  }
+}
