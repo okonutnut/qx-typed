@@ -1,16 +1,13 @@
-class ControlPage extends MyPage {
-
+class ControlPage extends qx.ui.tabview.Page {
   private vbox = new qx.ui.container.Composite(new qx.ui.layout.VBox(20));
 
   constructor() {
-      super("Control");
-      this.add(this.vbox, { top: 0 });
-      this.initWidgets();
+    super("Control");
+    this.add(this.vbox, { top: 0 });
+    this.initWidgets();
   }
-  
-  
+
   initWidgets() {
-   
     // ColorSelector
     var label: qx.ui.basic.Label = new qx.ui.basic.Label("ColorSelector");
     var colorSelector = new qx.ui.control.ColorSelector();
@@ -38,5 +35,4 @@ class ControlPage extends MyPage {
     this.vbox.add(label);
     this.vbox.add(dateChooser);
   }
-
-};
+}

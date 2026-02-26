@@ -1,4 +1,4 @@
-class IconsPage extends MyPage {
+class IconsPage extends qx.ui.tabview.Page {
   constructor() {
     super("Icons");
 
