@@ -54,6 +54,7 @@ class AppLayout extends qx.ui.container.Composite {
     const mainContentContainer = new qx.ui.container.Composite(
       new qx.ui.layout.Grow(),
     );
+    const mainContentScroll = new qx.ui.container.Scroll();
     const pageCache = new Map<string, qx.ui.core.Widget>();
     if (pageTitle) {
       pageCache.set(pageTitle, content);
@@ -88,7 +89,8 @@ class AppLayout extends qx.ui.container.Composite {
       if (isMobileMode) drawer?.close();
     });
 
-    contentContainer.add(mainContentContainer, { flex: 1, edge: 0 });
+    mainContentScroll.add(mainContentContainer);
+    contentContainer.add(mainContentScroll, { flex: 1, edge: 0 });
 
     const syncResponsiveMode = () => {
       const nextIsMobile = qx.bom.Viewport.getWidth() < MOBILE_BREAKPOINT;
@@ -128,6 +130,21 @@ const PAGE_DEFINITIONS: PageDefinition[] = [
     label: "Buttons",
     iconName: "banana",
     factory: () => new ButtonsPage(),
+  },
+  {
+    label: "Controls",
+    iconName: "sliders-horizontal",
+    factory: () => new ControlPage(),
+  },
+  {
+    label: "Table",
+    iconName: "table",
+    factory: () => new TablePage(),
+  },
+  {
+    label: "Windows",
+    iconName: "app-window",
+    factory: () => new WindowsPage(),
   },
 ];
 

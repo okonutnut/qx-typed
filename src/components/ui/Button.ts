@@ -75,7 +75,7 @@ class BsButton extends qx.ui.basic.Atom {
 
     this.__htmlButton.setHtml(`
       <div class="p-1">
-        <button type="button" class="btn ${this.__className}" ${tabIndexAttr}>
+        <button type="button" class="btn ${this.__className} w-full" ${tabIndexAttr}>
           ${iconPart}
           ${this.__buttonText}
         </button>

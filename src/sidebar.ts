@@ -9,7 +9,7 @@ class Sidebar extends qx.ui.container.Composite {
   private __buttons: BsSidebarButton[] = [];
 
   constructor(sidebarItems: SidebarItem[]) {
-    super(new qx.ui.layout.VBox().set({ alignX: "center" }));
+    super(new qx.ui.layout.VBox(0).set({ alignX: "center" }));
     this.setWidth(230);
     this.setPadding(10);
     this.setAlignX("center");
@@ -27,8 +27,6 @@ class Sidebar extends qx.ui.container.Composite {
       scale: true,
       width: 42,
       height: 42,
-      minWidth: 42,
-      minHeight: 42,
     });
     this.add(schoolLogo);
 
@@ -44,7 +42,7 @@ class Sidebar extends qx.ui.container.Composite {
     this.add(header);
 
     const itemsContainer = new qx.ui.container.Composite(
-      new qx.ui.layout.VBox(),
+      new qx.ui.layout.VBox(0),
     );
     itemsContainer.setAllowGrowX(true);
 
@@ -63,7 +61,7 @@ class Sidebar extends qx.ui.container.Composite {
 
       row.set({
         allowGrowX: true,
-        height: 35,
+        height: 40,
       });
 
       const button = new BsSidebarButton(item.label, item.icon);

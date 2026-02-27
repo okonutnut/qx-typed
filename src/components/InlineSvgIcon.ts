@@ -45,13 +45,18 @@ class InlineSvgIcon extends qx.ui.embed.Html {
         // Ensure currentColor (covers hardcoded strokes)
         out = out.replace(/stroke="[^"]*"/g, `stroke="currentColor"`);
 
-        // Ensure sizing (remove existing width/height then inject ours)
-        out = out.replace(/\swidth="[^"]*"/g, "");
-        out = out.replace(/\sheight="[^"]*"/g, "");
-        out = out.replace(
-          "<svg",
-          `<svg width="${this.__size}" height="${this.__size}" style="display:block;"`,
-        );
+        // Ensure sizing on root <svg> only (do not touch child element sizes)
+        out = out.replace(/<svg\b[^>]*>/, (tag) => {
+          const cleanedTag = tag
+            .replace(/\swidth="[^"]*"/g, "")
+            .replace(/\sheight="[^"]*"/g, "")
+            .replace(/\sstyle="[^"]*"/g, "");
+
+          return cleanedTag.replace(
+            "<svg",
+            `<svg width="${this.__size}" height="${this.__size}" style="display:block;"`,
+          );
+        });
 
         this.setHtml(out);
 

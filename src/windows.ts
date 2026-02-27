@@ -1,6 +1,6 @@
-class WindowsPage extends qx.ui.tabview.Page {
+class WindowsPage extends qx.ui.container.Composite {
   constructor() {
-    super("Windows");
+    super(new qx.ui.layout.VBox(10));
     const desktop = new qx.ui.window.Desktop();
     for (let n = 1; n <= 5; n++) {
       const win = new qx.ui.window.Window("Window " + n);

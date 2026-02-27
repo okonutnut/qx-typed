@@ -1,6 +1,6 @@
-class TablePage extends qx.ui.tabview.Page {
+class TablePage extends qx.ui.container.Composite {
   constructor() {
-    super("Table");
+    super(new qx.ui.layout.VBox(10));
     const table = this.createTable();
     table.setFocusedCell(2, 5);
     this.add(table);

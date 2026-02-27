@@ -1,54 +1,49 @@
 class ButtonsPage extends qx.ui.container.Composite {
   constructor() {
-    super(new qx.ui.layout.VBox(8));
+    super(new qx.ui.layout.VBox(10));
 
-    const container = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
+    const container = new qx.ui.container.Composite(new qx.ui.layout.HBox(10));
     let isRowLayout = true;
 
-    const button1 = new BsButton(
-      "Hello",
-      new InlineSvgIcon("message-circle", 16),
-      "btn-primary btn-sm w-full",
+    const primaryBtn = new BsButton("Primary", null, "btn-primary btn-sm");
+    const secondaryBtn = new BsButton(
+      "Secondary",
+      null,
+      "btn-secondary btn-sm",
     );
-    const button2 = new BsButton(
-      "Dark Theme",
-      new InlineSvgIcon("moon", 16),
-      "btn-secondary btn-sm w-full",
-    );
-    const button3 = new BsButton(
-      "Light Theme",
-      new InlineSvgIcon("sun", 16),
-      "btn-accent btn-sm w-full",
-    );
-    const button4 = new BsButton(
-      "Change Layout",
-      new InlineSvgIcon("layout-panel-top", 16),
-      "btn-outline btn-sm w-full",
-    );
+    const accentBtn = new BsButton("Accent", null, "btn-accent btn-sm");
+    const infoBtn = new BsButton("Info", null, "btn-info btn-sm");
+    const successBtn = new BsButton("Success", null, "btn-success btn-sm");
+    const warningBtn = new BsButton("Warning", null, "btn-warning btn-sm");
+    const errorBtn = new BsButton("Error", null, "btn-error btn-sm");
+    const outlineBtn = new BsButton("Outline", null, "btn-outline btn-sm");
 
-    button1.onClick(() => {
+    primaryBtn.onClick(() => {
       alert("Hello World!");
     });
-    button2.onClick(() => {
+    secondaryBtn.onClick(() => {
       alert("Hello World1");
     });
-    button3.onClick(() => {
+    accentBtn.onClick(() => {
       alert("Hello World2");
     });
-    button4.onClick(() => {
+    outlineBtn.onClick(() => {
       isRowLayout = !isRowLayout;
       container.setLayout(
-        isRowLayout ? new qx.ui.layout.HBox(8) : new qx.ui.layout.VBox(8),
+        isRowLayout ? new qx.ui.layout.HBox(10) : new qx.ui.layout.VBox(10),
       );
     });
 
     container.setAllowGrowX(true);
-    this.setPadding(10);
 
-    container.add(button1);
-    container.add(button2);
-    container.add(button3);
-    container.add(button4);
+    container.add(primaryBtn, { flex: 1 });
+    container.add(secondaryBtn, { flex: 1 });
+    container.add(accentBtn, { flex: 1 });
+    container.add(infoBtn, { flex: 1 });
+    container.add(successBtn, { flex: 1 });
+    container.add(warningBtn, { flex: 1 });
+    container.add(errorBtn, { flex: 1 });
+    container.add(outlineBtn, { flex: 1 });
 
     this.add(container);
   }

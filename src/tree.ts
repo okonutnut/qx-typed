@@ -1,7 +1,7 @@
 /**
  * Create a sample tree
  */
-function createTree(): qx.ui.tabview.Page {
+function createTree(): qx.ui.container.Composite {
   // create the tree
   const tree = new qx.ui.tree.Tree();
   tree.set({ width: 150, height: 300 });
