@@ -18,6 +18,12 @@ class AppLayout extends qx.ui.container.Composite {
     const navbar = new Navbar(pageTitle);
     contentContainer.add(navbar);
 
+    let isSidebarCollapsed = false;
+    navbar.addListener("toggleSidebar", () => {
+      isSidebarCollapsed = !isSidebarCollapsed;
+      sidebar.setCollapsed(isSidebarCollapsed);
+    });
+
     const mainContentContainer = new qx.ui.container.Composite(
       new qx.ui.layout.Grow(),
     );

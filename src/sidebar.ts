@@ -3,6 +3,11 @@ class Sidebar extends qx.ui.container.Composite {
     select: "qx.event.type.Data",
   };
 
+  private __collapsed = false;
+  private __header: qx.ui.basic.Label;
+  private __footer: qx.ui.basic.Label;
+  private __buttons: BsSidebarButton[] = [];
+
   constructor(sidebarItems: SidebarItem[]) {
     super(new qx.ui.layout.VBox().set({ alignX: "center" }));
     this.setWidth(230);
@@ -18,6 +23,7 @@ class Sidebar extends qx.ui.container.Composite {
     );
 
     const header = new qx.ui.basic.Label("My App");
+    this.__header = header;
     header.setFont(
       //@ts-ignore
       new qx.bom.Font(20, ["Arial", "sans-serif"]).set({ bold: true }),
@@ -54,6 +60,7 @@ class Sidebar extends qx.ui.container.Composite {
       button.setAllowGrowX(true);
       button.setWidth(230);
 
+      this.__buttons.push(button);
       buttonsByLabel.set(item.label, button);
 
       button.onClick(() => {
@@ -73,11 +80,40 @@ class Sidebar extends qx.ui.container.Composite {
     this.add(itemsContainer, { flex: 1 });
 
     const footer = new qx.ui.basic.Label("© 2024 My Company");
+    this.__footer = footer;
     //@ts-ignore
     footer.setFont(new qx.bom.Font(12, ["Arial", "sans-serif"]));
     footer.setTextAlign("center");
     footer.setHeight(30);
     footer.setPadding(5);
     this.add(footer);
+  }
+
+  public setCollapsed(collapsed: boolean): void {
+    this.__collapsed = collapsed;
+
+    if (collapsed) {
+      this.setWidth(72);
+      this.setPadding(8);
+      this.__header.exclude();
+      this.__footer.exclude();
+      this.__buttons.forEach((btn) => {
+        btn.setCollapsed(true);
+        btn.setWidth(56);
+      });
+    } else {
+      this.setWidth(230);
+      this.setPadding(10);
+      this.__header.show();
+      this.__footer.show();
+      this.__buttons.forEach((btn) => {
+        btn.setCollapsed(false);
+        btn.setWidth(230);
+      });
+    }
+  }
+
+  public isCollapsed(): boolean {
+    return this.__collapsed;
   }
 }

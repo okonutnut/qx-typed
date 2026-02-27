@@ -3,62 +3,132 @@
  */
 class FormPage extends qx.ui.container.Composite {
   constructor() {
-    super(new qx.ui.layout.VBox());
+    super(new qx.ui.layout.VBox(12));
+    this.setPadding(16);
 
-    const form = new qx.ui.form.Form();
-    this.addSection1(form);
-    this.addSection2(form);
-
-    // send button with validation
-    const sendButton = new qx.ui.form.Button("Send");
-    sendButton.addListener(
-      "execute",
-      function () {
-        if (form.validate()) {
-          alert("send...");
-        }
-      },
-      this,
+    const nameGroup = new BsInputGroup(
+      "Name",
+      "Enter your name",
+      "",
+      "input-bordered w-full",
     );
-    form.addButton(sendButton);
-
-    // reset button
-    const resetButton = new qx.ui.form.Button("Reset");
-    resetButton.addListener(
-      "execute",
-      function () {
-        form.reset("");
-      },
-      this,
+    const passwordGroup = new BsInputGroup(
+      "Password",
+      "Enter your password",
+      "",
+      "input-bordered w-full",
     );
-    form.addButton(resetButton);
+    const ageGroup = new BsInputGroup(
+      "Age",
+      "Enter your age",
+      "50",
+      "input-bordered w-full",
+    );
+    const countryGroup = new BsInputGroup(
+      "Country",
+      "Enter your country",
+      "",
+      "input-bordered w-full",
+    );
+    const bioGroup = new BsInputGroup(
+      "Bio",
+      "Tell us about yourself",
+      "",
+      "input-bordered w-full",
+    );
 
-    const formRenderer = new qx.ui.form.renderer.Single(form);
-    this.add(formRenderer);
-  }
+    const genderLabel = new qx.ui.basic.Label("Gender");
+    const genderSelect = new BsSelect(
+      ["Man", "Woman", "Genderqueer/Non-Binary", "Prefer not to disclose"],
+      "select-bordered w-full",
+    );
+    genderSelect.setAllowGrowX(true);
 
-  addSection1(form: qx.ui.form.Form) {
-    form.addGroupHeader("Registration");
-    const userName = new qx.ui.form.TextField();
-    userName.setRequired(true);
-    form.add(userName, "Name");
-    const password = new qx.ui.form.PasswordField();
-    password.setRequired(true);
-    form.add(password, "Password");
-    form.add(new qx.ui.form.CheckBox(), "Save?");
-  }
+    const genderError = new qx.ui.basic.Label("");
+    genderError.setVisibility("excluded");
+    genderError.addListenerOnce("appear", () => {
+      genderError.getContentElement().addClass("text-error");
+    });
 
-  addSection2(form: qx.ui.form.Form) {
-    // add the second header
-    form.addGroupHeader("Personal Information");
-    form.add(new qx.ui.form.Spinner(0, 50, 100), "Age");
-    form.add(new qx.ui.form.TextField(), "Country");
-    const genderBox = new qx.ui.form.SelectBox();
-    genderBox.add(new qx.ui.form.ListItem("Man"));
-    genderBox.add(new qx.ui.form.ListItem("Woman"));
-    genderBox.add(new qx.ui.form.ListItem("Genderqueer/Non-Binary"));
-    genderBox.add(new qx.ui.form.ListItem("Prefer not to disclose"));
-    form.add(genderBox, "Gender");
-    form.add(new qx.ui.form.TextArea(), "Bio");
+    const actions = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
+    const sendButton = new BsButton(
+      "Send",
+      undefined,
+      "btn-primary btn-sm w-full",
+    );
+    const resetButton = new BsButton(
+      "Reset",
+      undefined,
+      "btn-outline btn-sm w-full",
+    );
+
+    sendButton.onClick(() => {
+      let hasError = false;
+
+      const name = nameGroup.getValue().trim();
+      const password = passwordGroup.getValue().trim();
+      const ageValue = ageGroup.getValue().trim();
+      const gender = genderSelect.getSelectedValue();
+
+      if (!name) {
+        nameGroup.setError("Name is required");
+        hasError = true;
+      } else nameGroup.clearError();
+
+      if (!password) {
+        passwordGroup.setError("Password is required");
+        hasError = true;
+      } else if (password.length < 6) {
+        passwordGroup.setError("Password must be at least 6 characters");
+        hasError = true;
+      } else passwordGroup.clearError();
+
+      const age = Number(ageValue);
+      if (!ageValue) {
+        ageGroup.setError("Age is required");
+        hasError = true;
+      } else if (Number.isNaN(age) || age < 0 || age > 120) {
+        ageGroup.setError("Age must be between 0 and 120");
+        hasError = true;
+      } else ageGroup.clearError();
+
+      if (!gender) {
+        genderError.setValue("Gender is required");
+        genderError.show();
+        hasError = true;
+      } else {
+        genderError.setValue("");
+        genderError.exclude();
+      }
+
+      if (hasError) return;
+      alert("send...");
+    });
+
+    resetButton.onClick(() => {
+      nameGroup.setValue("").clearError();
+      passwordGroup.setValue("").clearError();
+      ageGroup.setValue("50").clearError();
+      countryGroup.setValue("").clearError();
+      bioGroup.setValue("").clearError();
+      genderSelect.resetSelection();
+      genderError.setValue("");
+      genderError.exclude();
+    });
+
+    actions.add(sendButton);
+    actions.add(resetButton);
+
+    this.add(nameGroup);
+    this.add(passwordGroup);
+    this.add(ageGroup);
+    this.add(countryGroup);
+
+    this.add(genderLabel);
+    this.add(genderSelect);
+    this.add(genderError);
+
+    this.add(bioGroup);
+    this.add(actions);
   }
 }

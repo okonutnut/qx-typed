@@ -1,4 +1,8 @@
 class Navbar extends qx.ui.container.Composite {
+  static events = {
+    toggleSidebar: "qx.event.type.Event",
+  };
+
   private __titleLabel: qx.ui.basic.Label;
 
   constructor(pageTitle?: string) {
@@ -21,6 +25,12 @@ class Navbar extends qx.ui.container.Composite {
       "btn-sm btn-ghost",
     );
     collapseSidebarBtn.setWidth(50);
+
+    // fire event when menu button is clicked
+    collapseSidebarBtn.onClick(() => {
+      this.fireEvent("toggleSidebar");
+    });
+
     this.add(collapseSidebarBtn);
 
     this.__titleLabel = new qx.ui.basic.Label(pageTitle ?? "Dashboard");
@@ -34,7 +44,6 @@ class Navbar extends qx.ui.container.Composite {
     this.__titleLabel.setValue(value);
   }
 
-  // Optional alias (keeps compatibility with older calls)
   public setTitle(value: string): void {
     this.setPageTitle(value);
   }

@@ -8,6 +8,8 @@ class BsSidebarButton extends qx.ui.basic.Atom {
   private __buttonText: string;
   private __className: string;
   private __active = false;
+  private __collapsed = false;
+  private __buttonEl: HTMLButtonElement | null = null;
 
   constructor(text?: string, icon?: InlineSvgIcon, className?: string) {
     super();
@@ -20,9 +22,14 @@ class BsSidebarButton extends qx.ui.basic.Atom {
 
     this.__iconHtml = icon ? icon.getHtml() : "";
     this.__buttonText = text ?? "";
-    this.__className = className || "";
+    this.__className = className ?? "";
 
     this.__renderButton();
+    this._add(this.__htmlButton);
+
+    this.__htmlButton.addListenerOnce("appear", () => {
+      this.__bindNativeButton();
+    });
 
     if (icon) {
       icon.addListener("changeHtml", () => {
@@ -30,33 +37,48 @@ class BsSidebarButton extends qx.ui.basic.Atom {
         this.__renderButton();
       });
     }
+  }
 
-    this.__htmlButton.addListener("tap", () => {
-      this.fireEvent("execute");
-    });
+  private __bindNativeButton(): void {
+    const root = this.__htmlButton.getContentElement().getDomElement();
+    const btn = root?.querySelector("button") ?? null;
+    this.__buttonEl = btn as HTMLButtonElement | null;
+    if (!this.__buttonEl) return;
 
-    this._add(this.__htmlButton);
+    this.__buttonEl.onclick = () => this.fireEvent("execute");
   }
 
   private __renderButton(): void {
     const iconPart = this.__iconHtml ? `<span>${this.__iconHtml}</span>` : "";
+    const textPart = this.__collapsed ? "" : this.__buttonText;
     const activeClass = this.__active
       ? "btn-active bg-base-200 font-semibold"
       : "";
+    const layoutClass = this.__collapsed ? "justify-center" : "justify-start";
 
     this.__htmlButton.setHtml(`
-      <button
-        type="button"
-        class="btn btn-ghost btn-sm w-full justify-start items-center gap-2 ${this.__className} ${activeClass}"
-      >
-        ${iconPart}
-        ${this.__buttonText}
-      </button>
+      <div class="p-1">
+        <button
+          type="button"
+          class="btn btn-ghost btn-sm w-full items-center gap-2 ${layoutClass} ${this.__className} ${activeClass}"
+        >
+          ${iconPart}
+          ${textPart}
+        </button>
+      </div>
     `);
+
+    qx.event.Timer.once(() => this.__bindNativeButton(), this, 0);
   }
 
   public setActive(active: boolean): this {
     this.__active = active;
+    this.__renderButton();
+    return this;
+  }
+
+  public setCollapsed(collapsed: boolean): this {
+    this.__collapsed = collapsed;
     this.__renderButton();
     return this;
   }
