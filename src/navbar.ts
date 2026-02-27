@@ -1,13 +1,12 @@
 class Navbar extends qx.ui.container.Composite {
-  constructor() {
-    super(new qx.ui.layout.HBox(10));
+  private __titleLabel: qx.ui.basic.Label;
 
-    this.setPadding(10);
-    this.setBackgroundColor("#fcfcfc");
-    this.setHeight(50);
+  constructor(pageTitle?: string) {
+    super(new qx.ui.layout.HBox(2));
     this.setAlignY("middle");
-
-    // ✅ Bottom border
+    this.setPadding(10);
+    this.setHeight(55);
+    this.setBackgroundColor("#fcfcfc");
     this.setDecorator(
       new qx.ui.decoration.Decorator().set({
         widthBottom: 1,
@@ -16,9 +15,27 @@ class Navbar extends qx.ui.container.Composite {
       }),
     );
 
-    const pageTitle = new qx.ui.basic.Label("My App");
-    pageTitle.setTextColor("#0f1729");
+    const collapseSidebarBtn = new BsButton(
+      "",
+      new InlineSvgIcon("menu", 16),
+      "btn-sm btn-ghost",
+    );
+    collapseSidebarBtn.setWidth(50);
+    this.add(collapseSidebarBtn);
 
-    this.add(pageTitle);
+    this.__titleLabel = new qx.ui.basic.Label(pageTitle ?? "Dashboard");
+    this.__titleLabel.setTextColor("#0f1729");
+    this.__titleLabel.setFont("bold");
+    this.__titleLabel.setAlignY("middle");
+    this.add(this.__titleLabel);
+  }
+
+  public setPageTitle(value: string): void {
+    this.__titleLabel.setValue(value);
+  }
+
+  // Optional alias (keeps compatibility with older calls)
+  public setTitle(value: string): void {
+    this.setPageTitle(value);
   }
 }

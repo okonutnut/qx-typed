@@ -4,19 +4,24 @@
   "main": "index.html",
   "repository": {},
   "dependencies": {
+    "@tailwindcss/cli": "^4.2.1",
+    "basecoat-css": "^0.3.11",
     "http-server": "^14.1.1",
-    "lucide-static": "^0.575.0"
+    "lucide-static": "^0.575.0",
+    "tailwindcss": "^4.2.1"
   },
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w --preserveWatchOutput",
     "serve:php": "php -S localhost:8080",
     "serve:reload": "browser-sync start --proxy \"localhost:8080\" --files \"lib/application.js, **/*.html, source/**/*.css\" --no-open",
-    "dev": "concurrently -k \"npm:watch\" \"npm:serve:php\" \"npm:serve:reload\""
+    "dev": "concurrently -k \"npm:watch\" \"npm:serve:php\" \"npm:serve:reload\"",
+    "build-css": "tailwindcss -i ./styles.css -o ./resource/app/styles.css --minify"
   },
   "devDependencies": {
     "browser-sync": "^3.0.4",
     "concurrently": "^9.2.1",
+    "daisyui": "^5.5.19",
     "typescript": "^5.9.3",
     "undici-types": "^7.22.0"
   }

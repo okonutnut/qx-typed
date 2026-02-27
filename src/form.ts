@@ -1,9 +1,9 @@
 /**
  * Create a sample form.
  */
-class FormPage extends qx.ui.tabview.Page {
+class FormPage extends qx.ui.container.Composite {
   constructor() {
-    super("Form");
+    super(new qx.ui.layout.VBox());
 
     const form = new qx.ui.form.Form();
     this.addSection1(form);
