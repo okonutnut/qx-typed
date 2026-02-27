@@ -59,12 +59,7 @@ class BsInput extends qx.ui.basic.Atom {
 
   private __syncTabIndex(): void {
     if (!this.__inputEl) return;
-    const idx = this.getTabIndex();
-    if (idx == null) {
-      this.__inputEl.removeAttribute("tabindex");
-    } else {
-      this.__inputEl.setAttribute("tabindex", String(idx));
-    }
+    this.__inputEl.setAttribute("tabindex", "-1");
   }
 
   private __escapeAttr(value: string): string {
@@ -79,8 +74,7 @@ class BsInput extends qx.ui.basic.Atom {
     const classes = `input ${this.__className}`.trim();
     const value = this.__escapeAttr(this.__value);
     const placeholder = this.__escapeAttr(this.__placeholder);
-    const idx = this.getTabIndex();
-    const tabIndexAttr = idx == null ? "" : `tabindex="${idx}"`;
+    const tabIndexAttr = 'tabindex="-1"';
 
     this.__htmlInput.setHtml(`
         <div class="p-1">

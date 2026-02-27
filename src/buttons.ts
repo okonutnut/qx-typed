@@ -1,46 +1,55 @@
-// Example import
-import Button = qx.ui.form.Button;
-
-class ButtonsPage extends qx.ui.tabview.Page {
+class ButtonsPage extends qx.ui.container.Composite {
   constructor() {
-    super("Buttons");
-    const button1 = new Button(
-      "Hello",
-      "resource/app/internet-web-browser.png",
-    );
-    const button2 = new Button(
-      "Dark Theme",
-      "resource/app/preferences-theme.png",
-    );
-    const button3 = new Button(
-      "Light Theme",
-      "resource/app/preferences-theme.png",
-    );
-    const button4 = new Button("Change Layout", "@MaterialIcons/face"); // use an icon font
+    super(new qx.ui.layout.VBox(8));
 
-    const meta = qx.theme.manager.Meta.getInstance();
-    button1.addListener("execute", function () {
+    const container = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
+    let isRowLayout = true;
+
+    const button1 = new BsButton(
+      "Hello",
+      new InlineSvgIcon("message-circle", 16),
+      "btn-primary btn-sm w-full",
+    );
+    const button2 = new BsButton(
+      "Dark Theme",
+      new InlineSvgIcon("moon", 16),
+      "btn-secondary btn-sm w-full",
+    );
+    const button3 = new BsButton(
+      "Light Theme",
+      new InlineSvgIcon("sun", 16),
+      "btn-accent btn-sm w-full",
+    );
+    const button4 = new BsButton(
+      "Change Layout",
+      new InlineSvgIcon("layout-panel-top", 16),
+      "btn-outline btn-sm w-full",
+    );
+
+    button1.onClick(() => {
       alert("Hello World!");
     });
-    button2.addListener("execute", function () {
-      meta.setTheme(qx.theme.TangibleDark);
+    button2.onClick(() => {
+      alert("Hello World1");
     });
-    button3.addListener("execute", function () {
-      meta.setTheme(qx.theme.TangibleLight);
+    button3.onClick(() => {
+      alert("Hello World2");
     });
-    button4.addListener("execute", function () {
-      container.getLayout() == layout1
-        ? container.setLayout(layout2)
-        : container.setLayout(layout1);
+    button4.onClick(() => {
+      isRowLayout = !isRowLayout;
+      container.setLayout(
+        isRowLayout ? new qx.ui.layout.HBox(8) : new qx.ui.layout.VBox(8),
+      );
     });
 
-    const layout1 = new qx.ui.layout.HBox();
-    const layout2 = new qx.ui.layout.VBox();
-    const container = new qx.ui.container.Composite(layout1);
+    container.setAllowGrowX(true);
+    this.setPadding(10);
+
     container.add(button1);
     container.add(button2);
     container.add(button3);
     container.add(button4);
+
     this.add(container);
   }
 }

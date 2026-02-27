@@ -5,7 +5,7 @@ class Navbar extends qx.ui.container.Composite {
 
   private __titleLabel: qx.ui.basic.Label;
 
-  constructor(pageTitle?: string) {
+  constructor(pageTitle?: string, onToggleSidebar?: () => void) {
     super(new qx.ui.layout.HBox(2));
     this.setAlignY("middle");
     this.setPadding(10);
@@ -29,14 +29,19 @@ class Navbar extends qx.ui.container.Composite {
     // fire event when menu button is clicked
     collapseSidebarBtn.onClick(() => {
       this.fireEvent("toggleSidebar");
+      if (onToggleSidebar) onToggleSidebar();
     });
 
     this.add(collapseSidebarBtn);
 
     this.__titleLabel = new qx.ui.basic.Label(pageTitle ?? "Dashboard");
     this.__titleLabel.setTextColor("#0f1729");
-    this.__titleLabel.setFont("bold");
+    this.__titleLabel.setFont(
+      // @ts-ignore
+      new qx.bom.Font(18, ["Inter", "sans-serif"]).set({ bold: true }),
+    );
     this.__titleLabel.setAlignY("middle");
+    this.setWidth(100);
     this.add(this.__titleLabel);
   }
 

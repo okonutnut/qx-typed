@@ -8,6 +8,7 @@ class BsButton extends qx.ui.basic.Atom {
   private __buttonText: string;
   private __className: string;
   private __buttonEl: HTMLButtonElement | null = null;
+  private __clickHandlers: Array<() => void> = [];
 
   constructor(text?: string, icon?: InlineSvgIcon, className?: string) {
     super();
@@ -52,6 +53,7 @@ class BsButton extends qx.ui.basic.Atom {
     // Prevent duplicate handlers after rebind
     this.__buttonEl.onclick = () => {
       this.fireEvent("execute");
+      this.__clickHandlers.forEach((handler) => handler());
     };
   }
 
@@ -72,10 +74,12 @@ class BsButton extends qx.ui.basic.Atom {
     const tabIndexAttr = idx == null ? "" : `tabindex="${idx}"`;
 
     this.__htmlButton.setHtml(`
-      <button type="button" class="btn ${this.__className}" ${tabIndexAttr}>
-        ${iconPart}
-        ${this.__buttonText}
-      </button>
+      <div class="p-1">
+        <button type="button" class="btn ${this.__className}" ${tabIndexAttr}>
+          ${iconPart}
+          ${this.__buttonText}
+        </button>
+      </div>
     `);
 
     // setHtml replaces DOM; rebind native events
@@ -83,7 +87,7 @@ class BsButton extends qx.ui.basic.Atom {
   }
 
   public onClick(handler: () => void): this {
-    this.addListener("execute", handler);
+    this.__clickHandlers.push(handler);
     return this;
   }
 }

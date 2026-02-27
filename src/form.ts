@@ -3,8 +3,7 @@
  */
 class FormPage extends qx.ui.container.Composite {
   constructor() {
-    super(new qx.ui.layout.VBox(12));
-    this.setPadding(16);
+    super(new qx.ui.layout.VBox(3));
 
     const nameGroup = new BsInputGroup(
       "Name",
@@ -12,6 +11,7 @@ class FormPage extends qx.ui.container.Composite {
       "",
       "input-bordered w-full",
     );
+
     const passwordGroup = new BsInputGroup(
       "Password",
       "Enter your password",
@@ -51,6 +51,8 @@ class FormPage extends qx.ui.container.Composite {
     });
 
     const actions = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
+    actions.setAllowGrowX(true);
+    actions.setMarginTop(12);
     const sendButton = new BsButton(
       "Send",
       undefined,
@@ -110,7 +112,7 @@ class FormPage extends qx.ui.container.Composite {
       passwordGroup.setValue("").clearError();
       ageGroup.setValue("50").clearError();
       countryGroup.setValue("").clearError();
-      bioGroup.setValue("").clearError();
+      bioGroup.setValue("");
       genderSelect.resetSelection();
       genderError.setValue("");
       genderError.exclude();

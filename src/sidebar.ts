@@ -22,11 +22,21 @@ class Sidebar extends qx.ui.container.Composite {
       }),
     );
 
-    const header = new qx.ui.basic.Label("My App");
+    const schoolLogo = new qx.ui.basic.Image("resource/app/ac_logo.png");
+    schoolLogo.set({
+      scale: true,
+      width: 42,
+      height: 42,
+      minWidth: 42,
+      minHeight: 42,
+    });
+    this.add(schoolLogo);
+
+    const header = new qx.ui.basic.Label("Aldersgate College Inc.");
     this.__header = header;
     header.setFont(
       //@ts-ignore
-      new qx.bom.Font(20, ["Arial", "sans-serif"]).set({ bold: true }),
+      new qx.bom.Font(12, ["Inter", "sans-serif"]).set({ bold: true }),
     );
     header.setTextAlign("center");
     header.setHeight(50);
@@ -79,10 +89,10 @@ class Sidebar extends qx.ui.container.Composite {
 
     this.add(itemsContainer, { flex: 1 });
 
-    const footer = new qx.ui.basic.Label("© 2024 My Company");
+    const footer = new qx.ui.basic.Label("SIAS Online 10.x");
     this.__footer = footer;
     //@ts-ignore
-    footer.setFont(new qx.bom.Font(12, ["Arial", "sans-serif"]));
+    footer.setFont(new qx.bom.Font(12, ["Inter", "sans-serif"]));
     footer.setTextAlign("center");
     footer.setHeight(30);
     footer.setPadding(5);
@@ -94,7 +104,7 @@ class Sidebar extends qx.ui.container.Composite {
 
     if (collapsed) {
       this.setWidth(72);
-      this.setPadding(8);
+      this.setPadding(10);
       this.__header.exclude();
       this.__footer.exclude();
       this.__buttons.forEach((btn) => {
