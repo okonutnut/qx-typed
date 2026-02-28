@@ -34,7 +34,7 @@ class Sidebar extends qx.ui.container.Composite {
     this.__header = header;
     header.setFont(
       //@ts-ignore
-      new qx.bom.Font(12, ["Inter", "sans-serif"]).set({ bold: true }),
+      new qx.bom.Font(12).set({ bold: true }),
     );
     header.setTextAlign("center");
     header.setHeight(50);

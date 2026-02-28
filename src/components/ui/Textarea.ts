@@ -62,9 +62,7 @@ class BsTextarea extends qx.ui.basic.Atom {
 
   private __syncTabIndex(): void {
     if (!this.__textareaEl) return;
-    const idx = this.getTabIndex();
-    if (idx == null) this.__textareaEl.removeAttribute("tabindex");
-    else this.__textareaEl.setAttribute("tabindex", String(idx));
+    this.__textareaEl.setAttribute("tabindex", "-1");
   }
 
   private __escapeAttr(value: string): string {
@@ -88,8 +86,7 @@ class BsTextarea extends qx.ui.basic.Atom {
       .join(" ");
     const value = this.__escapeAttr(this.__value);
     const placeholder = this.__escapeAttr(this.__placeholder);
-    const idx = this.getTabIndex();
-    const tabIndexAttr = idx == null ? "" : `tabindex="${idx}"`;
+    const tabIndexAttr = 'tabindex="-1"';
 
     this.__htmlTextarea.setHtml(`
       <div class="p-1">

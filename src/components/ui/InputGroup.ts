@@ -9,7 +9,7 @@ class BsInputGroup extends qx.ui.container.Composite {
     initialValue?: string,
     inputClassName?: string,
   ) {
-    super(new qx.ui.layout.VBox(6));
+    super(new qx.ui.layout.VBox(3));
     this.setAllowGrowX(true);
 
     this.__label = new qx.ui.basic.Label(labelText);
@@ -62,5 +62,15 @@ class BsInputGroup extends qx.ui.container.Composite {
 
   public getInputWidget(): BsInput {
     return this.__input;
+  }
+
+  public setInputTabIndex(value: number): this {
+    this.__input.setTabIndex(value);
+    return this;
+  }
+
+  public resetInputTabIndex(): this {
+    this.__input.resetTabIndex();
+    return this;
   }
 }

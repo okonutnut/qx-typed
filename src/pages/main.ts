@@ -8,7 +8,7 @@ class MainPage extends qx.ui.container.Composite {
     this.add(helloLabel);
 
     const checkBtn = new InlineSvgIcon("check", 24);
-    const button = new BsButton("Check Button", checkBtn, "btn-primary");
+    const button = new BsButton("Check Button", checkBtn, undefined, "primary");
     this.add(button);
   }
 }

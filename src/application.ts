@@ -10,11 +10,11 @@ class AppLayout extends qx.ui.container.Composite {
     this.setBackgroundColor(AppColors.background());
 
     // Register service worker for PWA support
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./sw.js").catch(console.error);
-      });
-    }
+    // if ("serviceWorker" in navigator) {
+    //   window.addEventListener("load", () => {
+    //     navigator.serviceWorker.register("./sw.js").catch(console.error);
+    //   });
+    // }
 
     const MOBILE_BREAKPOINT = 768;
     let isSidebarCollapsed = false;

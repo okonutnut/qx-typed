@@ -8,7 +8,7 @@ class Navbar extends qx.ui.container.Composite {
   constructor(pageTitle?: string, onToggleSidebar?: () => void) {
     super(new qx.ui.layout.HBox(2));
     this.setAlignY("middle");
-    this.setPadding(10);
+    this.setPadding(8);
     this.setHeight(55);
     this.setBackgroundColor(AppColors.card());
     this.setDecorator(
@@ -21,8 +21,9 @@ class Navbar extends qx.ui.container.Composite {
 
     const collapseSidebarBtn = new BsButton(
       "",
-      new InlineSvgIcon("menu", 16),
-      "btn-sm btn-ghost",
+      new InlineSvgIcon("panel-left-close", 8),
+      "btn-sm-icon-ghost p-1",
+      "ghost",
     );
     collapseSidebarBtn.setWidth(50);
 
@@ -37,7 +38,7 @@ class Navbar extends qx.ui.container.Composite {
     this.__titleLabel.setTextColor(AppColors.foreground());
     this.__titleLabel.setFont(
       // @ts-ignore
-      new qx.bom.Font(18, ["Inter", "sans-serif"]).set({ bold: true }),
+      new qx.bom.Font(18).set({ bold: true }),
     );
     this.__titleLabel.setAlignY("middle");
     this.setWidth(100);

@@ -59,7 +59,7 @@ class BsInput extends qx.ui.basic.Atom {
 
   private __syncTabIndex(): void {
     if (!this.__inputEl) return;
-    this.__inputEl.setAttribute("tabindex", "-1");
+    this.__inputEl.setAttribute("tabindex", "1");
   }
 
   private __escapeAttr(value: string): string {

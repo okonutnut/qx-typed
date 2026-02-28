@@ -43,10 +43,7 @@ class BsSelect extends qx.ui.basic.Atom {
 
   private __syncTabIndex(): void {
     if (!this.__selectEl) return;
-
-    const idx = this.getTabIndex();
-    if (idx == null) this.__selectEl.removeAttribute("tabindex");
-    else this.__selectEl.setAttribute("tabindex", String(idx));
+    this.__selectEl.setAttribute("tabindex", "-1");
   }
 
   private __bindNativeSelect(): void {
@@ -73,17 +70,8 @@ class BsSelect extends qx.ui.basic.Atom {
       }),
     ].join("");
 
-    const idx = this.getTabIndex();
-    const tabIndexAttr = idx == null ? "" : `tabindex="${idx}"`;
-    const classes = [
-      "select",
-      "bg-card",
-      "text-foreground",
-      "border-border",
-      this.__className,
-    ]
-      .filter(Boolean)
-      .join(" ");
+    const tabIndexAttr = 'tabindex="-1"';
+    const classes = ["select", this.__className].filter(Boolean).join(" ");
 
     this.__htmlSelect.setHtml(`
       <div class="p-1">

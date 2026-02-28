@@ -1,3 +1,16 @@
+type BsButtonVariant =
+  | "neutral"
+  | "primary"
+  | "secondary"
+  | "accent"
+  | "info"
+  | "success"
+  | "warning"
+  | "destructive"
+  | "outline"
+  | "ghost"
+  | "link";
+
 class BsButton extends qx.ui.basic.Atom {
   static events = {
     execute: "qx.event.type.Event",
@@ -7,9 +20,15 @@ class BsButton extends qx.ui.basic.Atom {
   private __iconHtml: string;
   private __buttonText: string;
   private __className: string;
+  private __variant: BsButtonVariant = "neutral";
   private __buttonEl: HTMLButtonElement | null = null;
 
-  constructor(text?: string, icon?: InlineSvgIcon, className?: string) {
+  constructor(
+    text?: string,
+    icon?: InlineSvgIcon,
+    className?: string,
+    variant?: BsButtonVariant,
+  ) {
     super();
 
     this._setLayout(new qx.ui.layout.Grow());
@@ -19,6 +38,7 @@ class BsButton extends qx.ui.basic.Atom {
     this.__iconHtml = icon ? icon.getHtml() : "";
     this.__buttonText = text ?? "";
     this.__className = className ?? "";
+    this.__variant = variant ?? "neutral";
 
     this.__htmlButton = new qx.ui.embed.Html("");
     this.__htmlButton.setAllowGrowX(true);
@@ -54,28 +74,14 @@ class BsButton extends qx.ui.basic.Atom {
 
   private __syncTabIndex(): void {
     if (!this.__buttonEl) return;
-
-    const idx = this.getTabIndex();
-    if (idx == null) {
-      this.__buttonEl.removeAttribute("tabindex");
-    } else {
-      this.__buttonEl.setAttribute("tabindex", String(idx));
-    }
+    this.__buttonEl.setAttribute("tabindex", "-1");
   }
 
   private __renderButton(): void {
     const iconPart = this.__iconHtml ? `<span>${this.__iconHtml}</span>` : "";
-    const idx = this.getTabIndex();
-    const tabIndexAttr = idx == null ? "" : `tabindex="${idx}"`;
-    const classes = [
-      "btn",
-      "w-full",
-      "bg-card",
-      "text-foreground",
-      "border",
-      "border-border",
-      this.__className,
-    ]
+    const tabIndexAttr = 'tabindex="-1"';
+    const variantClass = this.__resolveVariantClass();
+    const classes = ["w-full", this.__className, variantClass]
       .filter(Boolean)
       .join(" ");
 
@@ -90,6 +96,28 @@ class BsButton extends qx.ui.basic.Atom {
 
     // setHtml replaces DOM; rebind native events
     qx.event.Timer.once(() => this.__bindNativeButton(), this, 0);
+  }
+
+  private __resolveVariantClass(): string {
+    const variantClassMap: Record<BsButtonVariant, string> = {
+      neutral: "",
+      primary: "btn-primary",
+      secondary: "btn-secondary",
+      accent: "btn-accent",
+      info: "btn-info",
+      success: "btn-success",
+      warning: "btn-warning",
+      destructive: "btn-destructive",
+      outline: "btn-outline",
+      ghost: "btn-ghost",
+      link: "btn-link",
+    };
+
+    return variantClassMap[this.__variant];
+  }
+
+  public getVariant(): BsButtonVariant {
+    return this.__variant;
   }
 
   public onClick(handler: () => void): this {

@@ -11,17 +11,16 @@
     "tailwindcss": "^4.2.1"
   },
   "scripts": {
-    "build": "npm run build-css && tsc && node scripts/build-dist.mjs",
-    "watch": "tsc -w --preserveWatchOutput",
+    "build": "npm run build-css && tsc",
+    "watch": "tsc -w",
     "serve:php": "php -S localhost:8080",
-    "serve:reload": "browser-sync start --proxy \"localhost:8080\" --files \"lib/application.js, **/*.html, source/**/*.css\" --no-open",
+    "serve:reload": "browser-sync start --proxy \"localhost:8080\" --files \"lib/application.js, **/*.html, resource/app/styles.css\" --no-open",
     "dev": "concurrently -k \"npm:watch\" \"npm:serve:php\" \"npm:serve:reload\"",
     "build-css": "tailwindcss -i ./styles.css -o ./resource/app/styles.css --minify"
   },
   "devDependencies": {
     "browser-sync": "^3.0.4",
     "concurrently": "^9.2.1",
-    "daisyui": "^5.5.19",
     "typescript": "^5.9.3",
     "undici-types": "^7.22.0"
   }

@@ -9,7 +9,16 @@
     <title>SIAS Online 10.x</title>
 
     <!-- Import Compiled CSS -->
-    <link rel="stylesheet" type="text/css" href="resource/app/styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.11/dist/basecoat.cdn.min.css"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.11/dist/js/all.min.js"
+      defer
+    ></script>
+    <link rel="stylesheet" href="resource/app/styles.css" />
 
     <!-- PWA -->
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -21,5 +30,6 @@
   <body>
     <!-- Now include your own application code -->
     <script type="text/javascript" src="lib/application.js"></script>
+    <div id="toaster" class="toaster"></div>
   </body>
 </html>
