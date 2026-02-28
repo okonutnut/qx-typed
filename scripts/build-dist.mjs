@@ -70,6 +70,18 @@ function copyFileIfPresent(sourcePath, targetPath) {
   fs.copyFileSync(sourcePath, targetPath);
 }
 
+function emptyDirectory(directory) {
+  if (!fs.existsSync(directory)) {
+    fs.mkdirSync(directory, { recursive: true });
+    return;
+  }
+
+  const entries = fs.readdirSync(directory);
+  for (const entry of entries) {
+    fs.rmSync(path.join(directory, entry), { recursive: true, force: true });
+  }
+}
+
 function copyRequiredProjectFiles() {
   copyFileIfPresent(
     path.join(rootDir, "index.html"),
@@ -88,26 +100,12 @@ function copyRequiredProjectFiles() {
 
 function copyResourceWithFilteredIcons(usedIcons) {
   const iconDirPrefix = `${iconSourceDir}${path.sep}`;
-  const qxDir = path.join(resourceDir, "qx");
-  const qxDirPrefix = `${qxDir}${path.sep}`;
-  const excludedResourceFiles = new Set([
-    path.join(resourceDir, "qooxdoo.js"),
-    path.join(resourceDir, "qooxdoo_basic.js"),
-  ]);
   const distResourceDir = path.join(distDir, "resource");
   const distIconDir = path.join(distResourceDir, "app", "icons");
 
   fs.cpSync(resourceDir, distResourceDir, {
     recursive: true,
     filter: (sourcePath) => {
-      if (sourcePath === qxDir || sourcePath.startsWith(qxDirPrefix)) {
-        return false;
-      }
-
-      if (excludedResourceFiles.has(sourcePath)) {
-        return false;
-      }
-
       const normalized = sourcePath.endsWith(path.sep)
         ? sourcePath
         : `${sourcePath}${path.sep}`;
@@ -143,8 +141,7 @@ function copyResourceWithFilteredIcons(usedIcons) {
 }
 
 function buildDist() {
-  fs.rmSync(distDir, { recursive: true, force: true });
-  fs.mkdirSync(distDir, { recursive: true });
+  emptyDirectory(distDir);
 
   const usedIcons = collectUsedInlineSvgIcons(srcDir);
 
