@@ -76,7 +76,16 @@ class BsTextarea extends qx.ui.basic.Atom {
   }
 
   private __render(): void {
-    const classes = `textarea ${this.__className}`.trim();
+    const classes = [
+      "textarea",
+      "bg-card",
+      "text-foreground",
+      "border-border",
+      "placeholder:text-muted-foreground",
+      this.__className,
+    ]
+      .filter(Boolean)
+      .join(" ");
     const value = this.__escapeAttr(this.__value);
     const placeholder = this.__escapeAttr(this.__placeholder);
     const idx = this.getTabIndex();

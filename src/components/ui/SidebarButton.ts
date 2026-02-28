@@ -27,6 +27,8 @@ class BsSidebarButton extends qx.ui.basic.Atom {
     this.__renderButton();
     this._add(this.__htmlButton);
 
+    this.__htmlButton.addListener("tap", () => this.fireEvent("execute"));
+
     this.__htmlButton.addListenerOnce("appear", () => {
       this.__bindNativeButton();
     });
@@ -44,23 +46,32 @@ class BsSidebarButton extends qx.ui.basic.Atom {
     const btn = root?.querySelector("button") ?? null;
     this.__buttonEl = btn as HTMLButtonElement | null;
     if (!this.__buttonEl) return;
-
-    this.__buttonEl.onclick = () => this.fireEvent("execute");
   }
 
   private __renderButton(): void {
     const iconPart = this.__iconHtml ? `<span>${this.__iconHtml}</span>` : "";
     const textPart = this.__collapsed ? "" : this.__buttonText;
     const activeClass = this.__active
-      ? "btn-active bg-base-200 font-semibold"
-      : "";
+      ? "font-semibold btn-sm-primary"
+      : "btn-sm-ghost";
     const layoutClass = this.__collapsed ? "justify-center" : "justify-start";
+    const classes = [
+      "w-full",
+      "items-center",
+      "gap-2",
+      "border-sidebar-border",
+      layoutClass,
+      activeClass,
+      this.__className,
+    ]
+      .filter(Boolean)
+      .join(" ");
 
     this.__htmlButton.setHtml(`
       <div class="p-1">
         <button
           type="button"
-          class="btn btn-ghost btn-sm w-full items-center gap-2 ${layoutClass} ${this.__className} ${activeClass}"
+          class="${classes}"
         >
           ${iconPart}
           ${textPart}

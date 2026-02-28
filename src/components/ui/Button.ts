@@ -8,7 +8,6 @@ class BsButton extends qx.ui.basic.Atom {
   private __buttonText: string;
   private __className: string;
   private __buttonEl: HTMLButtonElement | null = null;
-  private __clickHandlers: Array<() => void> = [];
 
   constructor(text?: string, icon?: InlineSvgIcon, className?: string) {
     super();
@@ -26,6 +25,8 @@ class BsButton extends qx.ui.basic.Atom {
 
     this.__renderButton();
     this._add(this.__htmlButton);
+
+    this.__htmlButton.addListener("tap", () => this.fireEvent("execute"));
 
     this.__htmlButton.addListenerOnce("appear", () => {
       this.__bindNativeButton();
@@ -49,12 +50,6 @@ class BsButton extends qx.ui.basic.Atom {
     if (!this.__buttonEl) return;
 
     this.__syncTabIndex();
-
-    // Prevent duplicate handlers after rebind
-    this.__buttonEl.onclick = () => {
-      this.fireEvent("execute");
-      this.__clickHandlers.forEach((handler) => handler());
-    };
   }
 
   private __syncTabIndex(): void {
@@ -72,10 +67,21 @@ class BsButton extends qx.ui.basic.Atom {
     const iconPart = this.__iconHtml ? `<span>${this.__iconHtml}</span>` : "";
     const idx = this.getTabIndex();
     const tabIndexAttr = idx == null ? "" : `tabindex="${idx}"`;
+    const classes = [
+      "btn",
+      "w-full",
+      "bg-card",
+      "text-foreground",
+      "border",
+      "border-border",
+      this.__className,
+    ]
+      .filter(Boolean)
+      .join(" ");
 
     this.__htmlButton.setHtml(`
       <div class="p-1">
-        <button type="button" class="btn ${this.__className} w-full" ${tabIndexAttr}>
+        <button type="button" class="${classes}" ${tabIndexAttr}>
           ${iconPart}
           ${this.__buttonText}
         </button>
@@ -87,7 +93,7 @@ class BsButton extends qx.ui.basic.Atom {
   }
 
   public onClick(handler: () => void): this {
-    this.__clickHandlers.push(handler);
+    this.addListener("execute", handler);
     return this;
   }
 }

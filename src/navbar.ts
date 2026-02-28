@@ -10,12 +10,12 @@ class Navbar extends qx.ui.container.Composite {
     this.setAlignY("middle");
     this.setPadding(10);
     this.setHeight(55);
-    this.setBackgroundColor("#fcfcfc");
+    this.setBackgroundColor(AppColors.card());
     this.setDecorator(
       new qx.ui.decoration.Decorator().set({
         widthBottom: 1,
         styleBottom: "solid",
-        colorBottom: "#e5e7eb",
+        colorBottom: AppColors.border(),
       }),
     );
 
@@ -31,11 +31,10 @@ class Navbar extends qx.ui.container.Composite {
       this.fireEvent("toggleSidebar");
       if (onToggleSidebar) onToggleSidebar();
     });
-
     this.add(collapseSidebarBtn);
 
     this.__titleLabel = new qx.ui.basic.Label(pageTitle ?? "Dashboard");
-    this.__titleLabel.setTextColor("#0f1729");
+    this.__titleLabel.setTextColor(AppColors.foreground());
     this.__titleLabel.setFont(
       // @ts-ignore
       new qx.bom.Font(18, ["Inter", "sans-serif"]).set({ bold: true }),

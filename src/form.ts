@@ -11,7 +11,6 @@ class FormPage extends qx.ui.container.Composite {
       "",
       "input-bordered w-full",
     );
-
     const passwordGroup = new BsInputGroup(
       "Password",
       "Enter your password",

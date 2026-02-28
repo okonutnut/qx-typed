@@ -15,7 +15,11 @@ class ButtonsPage extends qx.ui.container.Composite {
     const infoBtn = new BsButton("Info", null, "btn-info btn-sm");
     const successBtn = new BsButton("Success", null, "btn-success btn-sm");
     const warningBtn = new BsButton("Warning", null, "btn-warning btn-sm");
-    const errorBtn = new BsButton("Error", null, "btn-error btn-sm");
+    const destructiveBtn = new BsButton(
+      "Error",
+      null,
+      "btn-destructive btn-sm",
+    );
     const outlineBtn = new BsButton("Outline", null, "btn-outline btn-sm");
 
     primaryBtn.onClick(() => {
@@ -42,7 +46,7 @@ class ButtonsPage extends qx.ui.container.Composite {
     container.add(infoBtn, { flex: 1 });
     container.add(successBtn, { flex: 1 });
     container.add(warningBtn, { flex: 1 });
-    container.add(errorBtn, { flex: 1 });
+    container.add(destructiveBtn, { flex: 1 });
     container.add(outlineBtn, { flex: 1 });
 
     this.add(container);

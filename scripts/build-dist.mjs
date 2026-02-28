@@ -76,9 +76,36 @@ function emptyDirectory(directory) {
     return;
   }
 
+  const sleep = (ms) => {
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+  };
+
+  const removeWithRetries = (targetPath, maxAttempts = 10) => {
+    for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+      try {
+        fs.rmSync(targetPath, {
+          recursive: true,
+          force: true,
+          maxRetries: 5,
+          retryDelay: 100,
+        });
+        return;
+      } catch (error) {
+        const isTransient =
+          error && ["ENOTEMPTY", "EPERM", "EBUSY"].includes(error.code);
+
+        if (!isTransient || attempt === maxAttempts) {
+          throw error;
+        }
+
+        sleep(80 * attempt);
+      }
+    }
+  };
+
   const entries = fs.readdirSync(directory);
   for (const entry of entries) {
-    fs.rmSync(path.join(directory, entry), { recursive: true, force: true });
+    removeWithRetries(path.join(directory, entry));
   }
 }
 

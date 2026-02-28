@@ -14,7 +14,7 @@ class BsDrawer extends qx.ui.container.Composite {
 
     this.__backdrop = new qx.ui.core.Widget();
     this.__backdrop.set({
-      backgroundColor: "rgba(15, 23, 42, 0.35)",
+      backgroundColor: AppColors.overlay(0.35),
       zIndex: 20,
     });
     this.__backdrop.addListener("tap", () => this.close());

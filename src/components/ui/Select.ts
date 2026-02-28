@@ -75,10 +75,19 @@ class BsSelect extends qx.ui.basic.Atom {
 
     const idx = this.getTabIndex();
     const tabIndexAttr = idx == null ? "" : `tabindex="${idx}"`;
+    const classes = [
+      "select",
+      "bg-card",
+      "text-foreground",
+      "border-border",
+      this.__className,
+    ]
+      .filter(Boolean)
+      .join(" ");
 
     this.__htmlSelect.setHtml(`
       <div class="p-1">
-        <select class="select ${this.__className}" ${tabIndexAttr}>
+        <select class="${classes}" ${tabIndexAttr}>
           ${optionsHtml}
         </select>
       </div>

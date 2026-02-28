@@ -13,12 +13,12 @@ class Sidebar extends qx.ui.container.Composite {
     this.setWidth(230);
     this.setPadding(10);
     this.setAlignX("center");
-    this.setBackgroundColor("#fcfcfc");
+    this.setBackgroundColor(AppColors.sidebar());
     this.setDecorator(
       new qx.ui.decoration.Decorator().set({
         widthRight: 1,
         styleRight: "solid",
-        colorRight: "#e5e7eb",
+        colorRight: AppColors.sidebarBorder(),
       }),
     );
 
@@ -39,6 +39,7 @@ class Sidebar extends qx.ui.container.Composite {
     header.setTextAlign("center");
     header.setHeight(50);
     header.setPadding(5);
+    header.setTextColor(AppColors.sidebarForeground());
     this.add(header);
 
     const itemsContainer = new qx.ui.container.Composite(
@@ -94,6 +95,7 @@ class Sidebar extends qx.ui.container.Composite {
     footer.setTextAlign("center");
     footer.setHeight(30);
     footer.setPadding(5);
+    footer.setTextColor(AppColors.sidebarForeground());
     this.add(footer);
   }
 

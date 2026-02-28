@@ -71,7 +71,16 @@ class BsInput extends qx.ui.basic.Atom {
   }
 
   private __render(): void {
-    const classes = `input ${this.__className}`.trim();
+    const classes = [
+      "input",
+      "bg-card",
+      "text-foreground",
+      "border-border",
+      "placeholder:text-muted-foreground",
+      this.__className,
+    ]
+      .filter(Boolean)
+      .join(" ");
     const value = this.__escapeAttr(this.__value);
     const placeholder = this.__escapeAttr(this.__placeholder);
     const tabIndexAttr = 'tabindex="-1"';

@@ -7,7 +7,7 @@ class AppLayout extends qx.ui.container.Composite {
   ) {
     super();
     this.setLayout(new qx.ui.layout.Grow());
-    this.setBackgroundColor("#f6f7f9");
+    this.setBackgroundColor(AppColors.background());
 
     // Register service worker for PWA support
     if ("serviceWorker" in navigator) {
