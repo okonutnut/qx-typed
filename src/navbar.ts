@@ -91,8 +91,20 @@ class Navbar extends qx.ui.container.Composite {
       textColor: AppColors.foreground(),
     });
 
-    actionsMenu.add(this.__createActionsMenuButton("Support", "support"));
-    actionsMenu.add(this.__createActionsMenuButton("About", "about"));
+    actionsMenu.add(
+      this.__createActionsMenuButton(
+        "Support",
+        new InlineSvgIcon("help-circle", 16),
+        "support",
+      ),
+    );
+    actionsMenu.add(
+      this.__createActionsMenuButton(
+        "About",
+        new InlineSvgIcon("info", 16),
+        "about",
+      ),
+    );
     this.__actionsPopup.add(actionsMenu);
 
     this.__actionsPopup.addListener("disappear", () => {
@@ -104,11 +116,14 @@ class Navbar extends qx.ui.container.Composite {
     });
   }
 
-  private __createActionsMenuButton(label: string, action: string): BsButton {
-    const button = new BsButton(label, undefined, "btn-sm-outline", "outline");
+  private __createActionsMenuButton(
+    label: string,
+    icon: InlineSvgIcon,
+    action: string,
+  ): BsButton {
+    const button = new BsButton(label, icon, "btn-sm-outline", "outline", true);
     button.setAllowGrowX(true);
-    button.setMarginTop(-2);
-    button.setMarginBottom(-2);
+    button.setHeight(40);
     button.onClick(() => {
       this.fireDataEvent("action", action);
       this.__closeActionsPopup();

@@ -21,6 +21,7 @@ class BsButton extends qx.ui.basic.Atom {
   private __buttonText: string;
   private __className: string;
   private __variant: BsButtonVariant = "neutral";
+  private __disableWrapperPadding = false;
   private __buttonEl: HTMLButtonElement | null = null;
 
   constructor(
@@ -28,6 +29,7 @@ class BsButton extends qx.ui.basic.Atom {
     icon?: InlineSvgIcon,
     className?: string,
     variant?: BsButtonVariant,
+    disableWrapperPadding?: boolean,
   ) {
     super();
 
@@ -39,6 +41,7 @@ class BsButton extends qx.ui.basic.Atom {
     this.__buttonText = text ?? "";
     this.__className = className ?? "";
     this.__variant = variant ?? "neutral";
+    this.__disableWrapperPadding = disableWrapperPadding ?? false;
 
     this.__htmlButton = new qx.ui.embed.Html("");
     this.__htmlButton.setAllowGrowX(true);
@@ -86,7 +89,7 @@ class BsButton extends qx.ui.basic.Atom {
       .join(" ");
 
     this.__htmlButton.setHtml(`
-      <div class="p-1">
+      <div class="${this.__disableWrapperPadding ? "" : "p-1"}">
         <button type="button" class="${classes}" ${tabIndexAttr}>
           ${iconPart}
           ${this.__buttonText}

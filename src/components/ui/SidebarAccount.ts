@@ -283,10 +283,18 @@ class BsSidebarAccount extends qx.ui.basic.Atom {
     this.__menuContainer.add(heading);
 
     this.__menuContainer.add(
-      this.__createMenuButton("Profile", "⇧⌘P", "profile"),
+      this.__createMenuButton(
+        "Profile",
+        new InlineSvgIcon("user-cog", 16),
+        "⇧⌘P",
+      ),
     );
     this.__menuContainer.add(
-      this.__createMenuButton("Settings", "⌘S", "settings"),
+      this.__createMenuButton(
+        "Settings",
+        new InlineSvgIcon("settings", 16),
+        "⌘S",
+      ),
     );
 
     const separator = new qx.ui.core.Widget();
@@ -299,24 +307,28 @@ class BsSidebarAccount extends qx.ui.basic.Atom {
     this.__menuContainer.add(separator);
 
     this.__menuContainer.add(
-      this.__createMenuButton("Log out", "⇧⌘Q", "logout"),
+      this.__createMenuButton(
+        "Log out",
+        new InlineSvgIcon("log-out", 16),
+        "⇧⌘Q",
+      ),
     );
   }
 
   private __createMenuButton(
     label: string,
-    shortcut: string,
+    icon: InlineSvgIcon,
     action: string,
   ): BsButton {
     const button = new BsButton(
-      `${label}    ${shortcut}`,
-      undefined,
+      `${label}`,
+      icon,
       "btn-sm-outline",
       "outline",
+      true,
     );
     button.setAllowGrowX(true);
-    button.setMarginTop(-2);
-    button.setMarginBottom(-2);
+    button.setHeight(40);
 
     button.onClick(() => {
       this.fireDataEvent("action", action);
@@ -371,7 +383,7 @@ class BsSidebarAccount extends qx.ui.basic.Atom {
       "rounded-md",
       "px-0.5",
       "py-1.5",
-      this.__isMenuOpen ? "btn-sm-primary" : "btn-sm-ghost",
+      "btn-sm-ghost",
       this.__collapsed ? "justify-center" : "justify-start",
       this.__className,
     ]

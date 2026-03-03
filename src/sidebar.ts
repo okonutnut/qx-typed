@@ -37,10 +37,21 @@ class Sidebar extends qx.ui.container.Composite {
       new qx.bom.Font(12).set({ bold: true }),
     );
     header.setTextAlign("center");
-    header.setHeight(50);
     header.setPadding(5);
     header.setTextColor(AppColors.sidebarForeground());
     this.add(header);
+
+    const appVersion = new qx.ui.basic.Label("SIAS Online x.xx");
+    appVersion.setTextColor(AppColors.sidebarForeground());
+    appVersion.setTextAlign("center");
+    appVersion.setOpacity(0.7);
+    appVersion.setFont(
+      // @ts-ignore
+      new qx.bom.Font(10, ["Inter", "sans-serif"]),
+    );
+    appVersion.setMarginTop(6);
+    appVersion.setMarginBottom(12);
+    this.add(appVersion);
 
     const itemsContainer = new qx.ui.container.Composite(
       new qx.ui.layout.VBox(0),
@@ -98,17 +109,6 @@ class Sidebar extends qx.ui.container.Composite {
     );
     this.__footer = footer;
     this.add(footer);
-
-    const appVersion = new qx.ui.basic.Label("SIAS Online 10.x");
-    appVersion.setTextColor(AppColors.sidebarForeground());
-    appVersion.setTextAlign("center");
-    appVersion.setOpacity(0.7);
-    appVersion.setFont(
-      // @ts-ignore
-      new qx.bom.Font(10, ["Inter", "sans-serif"]),
-    );
-    appVersion.setMarginTop(6);
-    this.add(appVersion);
   }
 
   public setCollapsed(collapsed: boolean): void {

@@ -9,7 +9,7 @@ class LoginLayout extends qx.ui.container.Composite {
     );
     this.setBackgroundColor(AppColors.background());
 
-    const card = new qx.ui.container.Composite(new qx.ui.layout.VBox(8));
+    const card = new qx.ui.container.Composite(new qx.ui.layout.VBox(0));
     card.setWidth(350);
     card.setAllowGrowX(false);
     card.setPadding(20);
@@ -52,7 +52,7 @@ class LoginLayout extends qx.ui.container.Composite {
       new qx.bom.Font(12, ["Inter", "sans-serif"]).set({ bold: true }),
     );
     location.setTextColor(AppColors.foreground());
-    location.setMarginBottom(12);
+    location.setMarginBottom(30);
     card.add(location);
 
     const username = new BsInput("", "Username");
