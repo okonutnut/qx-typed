@@ -5,7 +5,7 @@ class Sidebar extends qx.ui.container.Composite {
 
   private __collapsed = false;
   private __header: qx.ui.basic.Label;
-  private __footer: qx.ui.basic.Label;
+  private __footer: BsSidebarAccount;
   private __buttons: BsSidebarButton[] = [];
 
   constructor(sidebarItems: SidebarItem[]) {
@@ -88,14 +88,13 @@ class Sidebar extends qx.ui.container.Composite {
 
     this.add(itemsContainer, { flex: 1 });
 
-    const footer = new qx.ui.basic.Label("SIAS Online 10.x");
+    const footer = new BsSidebarAccount(
+      "Ronan Berder",
+      "@hunvreus",
+      "resource/app/user.png",
+      "RB",
+    );
     this.__footer = footer;
-    //@ts-ignore
-    footer.setFont(new qx.bom.Font(12, ["Inter", "sans-serif"]));
-    footer.setTextAlign("center");
-    footer.setHeight(30);
-    footer.setPadding(5);
-    footer.setTextColor(AppColors.sidebarForeground());
     this.add(footer);
   }
 
@@ -106,7 +105,8 @@ class Sidebar extends qx.ui.container.Composite {
       this.setWidth(72);
       this.setPadding(10);
       this.__header.exclude();
-      this.__footer.exclude();
+      this.__footer.show();
+      this.__footer.setCollapsed(true);
       this.__buttons.forEach((btn) => {
         btn.setCollapsed(true);
         btn.setWidth(56);
@@ -116,6 +116,7 @@ class Sidebar extends qx.ui.container.Composite {
       this.setPadding(10);
       this.__header.show();
       this.__footer.show();
+      this.__footer.setCollapsed(false);
       this.__buttons.forEach((btn) => {
         btn.setCollapsed(false);
         btn.setWidth(230);

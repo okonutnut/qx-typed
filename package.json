@@ -12,7 +12,7 @@
   },
   "scripts": {
     "build": "npm run build-css && tsc",
-    "watch": "tsc -w",
+    "watch": "tsc -w --preserveWatchOutput",
     "serve:php": "php -S localhost:8080",
     "serve:reload": "browser-sync start --proxy \"localhost:8080\" --files \"lib/application.js, **/*.html, resource/app/styles.css\" --no-open",
     "dev": "concurrently -k \"npm:watch\" \"npm:serve:php\" \"npm:serve:reload\"",
