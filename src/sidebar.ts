@@ -8,7 +8,7 @@ class Sidebar extends qx.ui.container.Composite {
   private __footer: BsSidebarAccount;
   private __buttons: BsSidebarButton[] = [];
 
-  constructor(sidebarItems: SidebarItem[]) {
+  constructor(sidebarItems: SidebarItem[], initialActiveLabel?: string) {
     super(new qx.ui.layout.VBox(0).set({ alignX: "center" }));
     this.setWidth(230);
     this.setPadding(10);
@@ -81,8 +81,10 @@ class Sidebar extends qx.ui.container.Composite {
       itemsContainer.add(row);
     });
 
-    // Set first item active initially
-    if (sidebarItems.length > 0) {
+    // Set initial active item; fallback to first only when no explicit initial label is provided
+    if (initialActiveLabel && buttonsByLabel.has(initialActiveLabel)) {
+      setActiveLabel(initialActiveLabel);
+    } else if (!initialActiveLabel && sidebarItems.length > 0) {
       setActiveLabel(sidebarItems[0].label);
     }
 
@@ -96,6 +98,17 @@ class Sidebar extends qx.ui.container.Composite {
     );
     this.__footer = footer;
     this.add(footer);
+
+    const appVersion = new qx.ui.basic.Label("SIAS Online 10.x");
+    appVersion.setTextColor(AppColors.sidebarForeground());
+    appVersion.setTextAlign("center");
+    appVersion.setOpacity(0.7);
+    appVersion.setFont(
+      // @ts-ignore
+      new qx.bom.Font(10, ["Inter", "sans-serif"]),
+    );
+    appVersion.setMarginTop(6);
+    this.add(appVersion);
   }
 
   public setCollapsed(collapsed: boolean): void {

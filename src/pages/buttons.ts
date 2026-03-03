@@ -1,6 +1,12 @@
 class ButtonsPage extends qx.ui.container.Composite {
   constructor() {
     super(new qx.ui.layout.VBox(10));
+    const alertDialog = new BsAlertDialog({
+      id: "buttons-alert-dialog",
+      title: "Are you absolutely sure?",
+      description:
+        "This action cannot be undone. This will permanently delete your account and remove your data from our servers.",
+    });
 
     const container = new qx.ui.container.Composite(new qx.ui.layout.HBox(10));
     let isRowLayout = true;
@@ -22,6 +28,12 @@ class ButtonsPage extends qx.ui.container.Composite {
       "btn-sm-outline",
       "outline",
     );
+    const alertDialogBtn = new BsButton(
+      "Open Alert Dialog",
+      null,
+      "btn-sm-outline",
+      "outline",
+    );
 
     primaryBtn.setTabIndex(1);
     secondaryBtn.setTabIndex(2);
@@ -30,6 +42,7 @@ class ButtonsPage extends qx.ui.container.Composite {
     destructiveBtn.setTabIndex(5);
     outlineBtn.setTabIndex(6);
     toastBtn.setTabIndex(7);
+    alertDialogBtn.setTabIndex(8);
 
     primaryBtn.onClick(() => {
       alert("Hello World!");
@@ -62,6 +75,9 @@ class ButtonsPage extends qx.ui.container.Composite {
         }),
       );
     });
+    alertDialogBtn.onClick(() => {
+      alertDialog.show();
+    });
 
     container.setAllowGrowX(true);
 
@@ -72,6 +88,7 @@ class ButtonsPage extends qx.ui.container.Composite {
     container.add(destructiveBtn, { flex: 1 });
     container.add(outlineBtn, { flex: 1 });
     container.add(toastBtn, { flex: 1 });
+    container.add(alertDialogBtn, { flex: 1 });
 
     this.add(container);
   }
