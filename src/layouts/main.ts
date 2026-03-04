@@ -1,4 +1,8 @@
 class MainLayout extends qx.ui.container.Composite {
+  static events = {
+    logout: "qx.event.type.Event",
+  };
+
   constructor(
     content: qx.ui.core.Widget,
     sidebarItems: SidebarItem[],
@@ -87,6 +91,12 @@ class MainLayout extends qx.ui.container.Composite {
 
       navbar.setPageTitle(label);
       if (isMobileMode) drawer?.close();
+    });
+
+    sidebar.addListener("action", (ev: qx.event.type.Data) => {
+      if ((ev.getData() as string) === "logout") {
+        this.fireEvent("logout");
+      }
     });
 
     mainContentScroll.add(mainContentContainer);

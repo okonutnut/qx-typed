@@ -11,26 +11,26 @@ class ButtonsPage extends qx.ui.container.Composite {
     const container = new qx.ui.container.Composite(new qx.ui.layout.HBox(10));
     let isRowLayout = true;
 
-    const primaryBtn = new BsButton("Primary", null, "btn-sm", "primary");
-    const secondaryBtn = new BsButton("Secondary", null, "btn-sm", "secondary");
-    const ghostBtn = new BsButton("Ghost", null, "btn-sm-ghost", "ghost");
-    const btnLink = new BsButton("Link", null, "btn-sm-link", "link");
-    const destructiveBtn = new BsButton("Error", null, "btn-sm", "destructive");
+    const primaryBtn = new BsButton("Primary", undefined, "btn-sm", "primary");
+    const secondaryBtn = new BsButton("Secondary", undefined, "btn-sm", "secondary");
+    const ghostBtn = new BsButton("Ghost", undefined, "btn-sm-ghost", "ghost");
+    const btnLink = new BsButton("Link", undefined, "btn-sm-link", "link");
+    const destructiveBtn = new BsButton("Error", undefined, "btn-sm", "destructive");
     const outlineBtn = new BsButton(
       "Outline",
-      null,
+      undefined,
       "btn-sm-outline",
       "outline",
     );
     const toastBtn = new BsButton(
       "Show Toast",
-      null,
+      undefined,
       "btn-sm-outline",
       "outline",
     );
     const alertDialogBtn = new BsButton(
       "Open Alert Dialog",
-      null,
+      undefined,
       "btn-sm-outline",
       "outline",
     );

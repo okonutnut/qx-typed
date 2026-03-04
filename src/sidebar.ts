@@ -1,6 +1,7 @@
 class Sidebar extends qx.ui.container.Composite {
   static events = {
     select: "qx.event.type.Data",
+    action: "qx.event.type.Data",
   };
 
   private __collapsed = false;
@@ -102,12 +103,15 @@ class Sidebar extends qx.ui.container.Composite {
     this.add(itemsContainer, { flex: 1 });
 
     const footer = new BsSidebarAccount(
-      "Ronan Berder",
-      "@hunvreus",
+      globalThis.username || "User",
+      "Student",
       "resource/app/user.png",
       "RB",
     );
     this.__footer = footer;
+    this.__footer.onAction((action) => {
+      this.fireDataEvent("action", action);
+    });
     this.add(footer);
   }
 

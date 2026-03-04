@@ -25,6 +25,10 @@ class AppColors {
     return resolved;
   }
 
+  static primary(): string {
+    return this.resolveCssVar("--color-primary", "#f6f7f9");
+  }
+
   static background(): string {
     return this.resolveCssVar("--color-background", "#f6f7f9");
   }

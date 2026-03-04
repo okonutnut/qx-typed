@@ -102,9 +102,15 @@ class Navbar extends qx.ui.container.Composite {
       this.__createActionsMenuButton(
         "About",
         new InlineSvgIcon("info", 16),
-        "about",
+        "show-about-dialog",
       ),
     );
+    this.addListener("action", (ev: qx.event.type.Data) => {
+      if ((ev.getData() as string) === "show-about-dialog") {
+        aboutAlertDialog.show();
+      }
+    });
+
     this.__actionsPopup.add(actionsMenu);
 
     this.__actionsPopup.addListener("disappear", () => {
@@ -120,8 +126,8 @@ class Navbar extends qx.ui.container.Composite {
     label: string,
     icon: InlineSvgIcon,
     action: string,
-  ): BsButton {
-    const button = new BsButton(label, icon, "btn-sm-outline", "outline", true);
+  ): BsSidebarButton {
+    const button = new BsSidebarButton(label, icon, "btn-sm-outline");
     button.setAllowGrowX(true);
     button.setHeight(40);
     button.onClick(() => {

@@ -41,6 +41,7 @@ class LoginLayout extends qx.ui.container.Composite {
       new qx.bom.Font(16, ["Inter", "sans-serif"]).set({ bold: true }),
     );
     title.setTextColor(AppColors.foreground());
+    title.setMarginBottom(10);
     card.add(title);
 
     const location = new qx.ui.basic.Label("Solano, Nueva Vizcaya");
@@ -61,6 +62,7 @@ class LoginLayout extends qx.ui.container.Composite {
     card.add(password);
 
     const triggerLogin = () => {
+      globalThis.username = username.getValue().trim();
       this.fireEvent("login");
     };
 

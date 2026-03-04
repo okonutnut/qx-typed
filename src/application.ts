@@ -14,7 +14,16 @@ function qooxdooMain(app: qx.application.Standalone) {
   const initialTitle = "Welcome";
 
   const createMainLayout = () => {
-    return new MainLayout(initialPage, sidebarItems, pageMap, initialTitle);
+    const mainLayout = new MainLayout(
+      initialPage,
+      sidebarItems,
+      pageMap,
+      initialTitle,
+    );
+    mainLayout.addListener("logout", () => {
+      setAppLayout("login");
+    });
+    return mainLayout;
   };
 
   const createLoginLayout = () => {

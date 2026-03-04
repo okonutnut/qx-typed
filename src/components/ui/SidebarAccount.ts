@@ -310,7 +310,7 @@ class BsSidebarAccount extends qx.ui.basic.Atom {
       this.__createMenuButton(
         "Log out",
         new InlineSvgIcon("log-out", 16),
-        "⇧⌘Q",
+        "logout-account",
       ),
     );
   }
@@ -319,19 +319,18 @@ class BsSidebarAccount extends qx.ui.basic.Atom {
     label: string,
     icon: InlineSvgIcon,
     action: string,
-  ): BsButton {
-    const button = new BsButton(
+  ): BsSidebarButton {
+    const button = new BsSidebarButton(
       `${label}`,
       icon,
       "btn-sm-outline",
-      "outline",
-      true,
     );
     button.setAllowGrowX(true);
     button.setHeight(40);
 
     button.onClick(() => {
-      this.fireDataEvent("action", action);
+      const normalizedAction = action === "logout-account" ? "logout" : action;
+      this.fireDataEvent("action", normalizedAction);
       this.__closeMenu();
     });
 
