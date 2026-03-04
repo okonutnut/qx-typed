@@ -13,7 +13,7 @@ class Navbar extends qx.ui.container.Composite {
     this.setAlignY("middle");
     this.setPadding(8);
     this.setHeight(55);
-    this.setBackgroundColor(AppColors.card());
+    this.setBackgroundColor(AppColors.background());
     this.setDecorator(
       new qx.ui.decoration.Decorator().set({
         widthBottom: 1,
@@ -87,7 +87,7 @@ class Navbar extends qx.ui.container.Composite {
       paddingRight: 6,
       paddingBottom: 6,
       paddingLeft: 6,
-      backgroundColor: AppColors.card(),
+      backgroundColor: AppColors.background(),
       textColor: AppColors.foreground(),
     });
 

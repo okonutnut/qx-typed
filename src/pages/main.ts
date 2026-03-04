@@ -13,7 +13,7 @@ class MainPage extends qx.ui.container.Composite {
     );
     welcomeCard.setWidth(520);
     welcomeCard.setPadding(24);
-    welcomeCard.setBackgroundColor(AppColors.card());
+    welcomeCard.setBackgroundColor(AppColors.background());
 
     const title = new qx.ui.basic.Label("Welcome to SIAS x.xx");
     title.setTextColor(AppColors.mutedForeground());
