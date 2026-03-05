@@ -12,64 +12,70 @@ type SidebarDefinition = {
 
 const PAGE_DEFINITIONS: PageDefinition[] = [
   {
-    label: "Form",
-    iconName: "notebook-pen",
-    factory: () => new FormPage(),
+    label: "Subjects",
+    iconName: "book-open",
+    factory: () => new SubjectsPage(),
   },
   {
-    label: "Buttons",
-    iconName: "banana",
-    factory: () => new ButtonsPage(),
+    label: "Faculty",
+    iconName: "users",
+    factory: () => new FacultyPage(),
   },
   {
-    label: "Controls",
-    iconName: "sliders-horizontal",
-    factory: () => new ControlPage(),
+    label: "Rooms",
+    iconName: "door-open",
+    factory: () => new RoomsPage(),
   },
   {
-    label: "Table",
-    iconName: "table",
-    factory: () => new TablePage(),
+    label: "Semesters",
+    iconName: "calendar",
+    factory: () => new SemestersPage(),
   },
   {
-    label: "Windows",
-    iconName: "app-window",
-    factory: () => new WindowsPage(),
+    label: "Class Schedules",
+    iconName: "clock",
+    factory: () => new SchedulesPage(),
   },
 ];
 
 const SIDEBAR_DEFINITIONS: SidebarDefinition[] = [
   {
-    label: "Workspace",
-    iconName: "folder-tree",
+    label: "Academic",
+    iconName: "graduation-cap",
     children: [
       {
-        label: "Form",
-        iconName: "notebook-pen",
+        label: "Subjects",
+        iconName: "book-open",
       },
       {
-        label: "Buttons",
-        iconName: "banana",
+        label: "Faculty",
+        iconName: "users",
       },
       {
-        label: "Controls",
-        iconName: "sliders-horizontal",
+        label: "Rooms",
+        iconName: "door-open",
       },
     ],
   },
   {
-    label: "Data",
-    iconName: "table",
+    label: "Scheduling",
+    iconName: "clock",
     children: [
       {
-        label: "Table",
-        iconName: "table",
+        label: "Class Schedules",
+        iconName: "clock",
       },
     ],
   },
   {
-    label: "Windows",
-    iconName: "app-window",
+    label: "Settings",
+    iconName: "settings",
+    children: [
+      {
+        label: "Semesters",
+        iconName: "calendar",
+      },
+    ],
   },
 ];
 

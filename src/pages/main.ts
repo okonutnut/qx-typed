@@ -17,7 +17,8 @@ class MainPage extends qx.ui.container.Composite {
     welcomeCard.setPadding(24);
     welcomeCard.setBackgroundColor(AppColors.background());
 
-    const title = new qx.ui.basic.Label("Welcome to SIAS x.xx");
+    const name = typeof userFullName !== "undefined" ? userFullName : "User";
+    const title = new qx.ui.basic.Label(`Welcome, ${name}`);
     title.setTextColor(AppColors.mutedForeground());
     title.setTextAlign("center");
     title.setAlignX("center");
@@ -27,7 +28,7 @@ class MainPage extends qx.ui.container.Composite {
     );
 
     const subtitle = new qx.ui.basic.Label(
-      "Your workspace is ready. Use the sidebar to explore components and pages.",
+      "SIAS Online — Class Scheduling & Faculty Management. Use the sidebar to manage subjects, faculty, rooms, semesters, and class schedules.",
     );
     subtitle.setWidth(400);
     subtitle.setTextColor(AppColors.mutedForeground());
