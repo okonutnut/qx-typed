@@ -7,9 +7,11 @@ class BsSidebarButton extends qx.ui.basic.Atom {
   private __iconHtml: string;
   private __buttonText: string;
   private __className: string;
+  private __trailingHtml = "";
   private __active = false;
   private __collapsed = false;
   private __buttonEl: HTMLButtonElement | null = null;
+  private __renderPending = false;
 
   constructor(text?: string, icon?: InlineSvgIcon, className?: string) {
     super();
@@ -51,6 +53,10 @@ class BsSidebarButton extends qx.ui.basic.Atom {
   private __renderButton(): void {
     const iconPart = this.__iconHtml ? `<span>${this.__iconHtml}</span>` : "";
     const textPart = this.__collapsed ? "" : this.__buttonText;
+    const trailingPart =
+      !this.__collapsed && this.__trailingHtml
+        ? `<span style="margin-left:auto;opacity:0.75;line-height:1">${this.__trailingHtml}</span>`
+        : "";
     const activeClass = this.__active
       ? "font-semibold btn-sm-primary"
       : "btn-sm-ghost";
@@ -59,6 +65,9 @@ class BsSidebarButton extends qx.ui.basic.Atom {
       "w-full",
       "items-center",
       "gap-2",
+      "transition",
+      "duration-200",
+      "ease-in-out",
       "border-sidebar-border",
       layoutClass,
       activeClass,
@@ -75,6 +84,7 @@ class BsSidebarButton extends qx.ui.basic.Atom {
         >
           ${iconPart}
           ${textPart}
+          ${trailingPart}
         </button>
       </div>
     `);
@@ -83,19 +93,37 @@ class BsSidebarButton extends qx.ui.basic.Atom {
   }
 
   public setActive(active: boolean): this {
+    if (this.__active === active) return this;
     this.__active = active;
-    this.__renderButton();
+    this.__scheduleRender();
     return this;
   }
 
   public setCollapsed(collapsed: boolean): this {
+    if (this.__collapsed === collapsed) return this;
     this.__collapsed = collapsed;
-    this.__renderButton();
+    this.__scheduleRender();
     return this;
   }
 
   public onClick(handler: () => void): this {
     this.addListener("execute", handler);
     return this;
+  }
+
+  public setTrailingHtml(html: string): this {
+    if (this.__trailingHtml === html) return this;
+    this.__trailingHtml = html;
+    this.__scheduleRender();
+    return this;
+  }
+
+  private __scheduleRender(): void {
+    if (this.__renderPending) return;
+    this.__renderPending = true;
+    queueMicrotask(() => {
+      this.__renderPending = false;
+      this.__renderButton();
+    });
   }
 }

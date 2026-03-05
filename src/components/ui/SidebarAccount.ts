@@ -23,6 +23,7 @@ class BsSidebarAccount extends qx.ui.basic.Atom {
   private __chevronUpDownHTML: string;
   private __menuPopup: qx.ui.popup.Popup;
   private __menuContainer: qx.ui.container.Composite;
+  private __menuAnimToken = 0;
 
   constructor(
     name?: string,
@@ -90,7 +91,7 @@ class BsSidebarAccount extends qx.ui.basic.Atom {
     this.__renderButton();
     this._add(this.__htmlButton);
 
-    this.__htmlButton.addListenerOnce("appear", () => {
+    this.__htmlButton.addListener("appear", () => {
       this.__bindNativeButton();
     });
 
@@ -100,10 +101,12 @@ class BsSidebarAccount extends qx.ui.basic.Atom {
       this.__renderButton();
     });
 
-    this.addListenerOnce("disappear", () => {
+    this.addListener("disappear", () => {
+      this.__isMenuOpen = false;
       this.__unbindOutsideClick();
       this.__unbindNativeButton();
       this.__menuPopup.hide();
+      this.__renderButton();
     });
   }
 
@@ -182,19 +185,60 @@ class BsSidebarAccount extends qx.ui.basic.Atom {
     if (!this.__isMenuOpen) return;
     this.__isMenuOpen = false;
     this.__unbindOutsideClick();
-    this.__menuPopup.hide();
-    this.__renderButton();
+    const token = ++this.__menuAnimToken;
+    this.__setPopupAnimationStyles({
+      opacity: "0",
+      transform: "translateY(-4px) scale(0.98)",
+      transition: "opacity 100ms ease, transform 120ms ease",
+      pointerEvents: "none",
+    });
+    qx.event.Timer.once(
+      () => {
+        if (token !== this.__menuAnimToken) return;
+        this.__menuPopup.hide();
+        this.__renderButton();
+      },
+      this,
+      120,
+    );
   }
 
   private __openMenu(): void {
+    const token = ++this.__menuAnimToken;
     this.__menuPopup.show();
     this.__isMenuOpen = true;
     this.__renderButton();
     this.__bindOutsideClick();
-    qx.event.Timer.once(() => this.__placeMenuPopup(), this, 0);
-    qx.event.Timer.once(() => this.__placeMenuPopup(), this, 16);
-    qx.event.Timer.once(() => this.__placeMenuPopup(), this, 64);
-    qx.event.Timer.once(() => this.__placeMenuPopup(), this, 120);
+    this.__placeMenuPopup();
+    this.__setPopupAnimationStyles({
+      opacity: "0",
+      transform: "translateY(-6px) scale(0.985)",
+      transition:
+        "opacity 120ms ease, transform 140ms cubic-bezier(0.16, 1, 0.3, 1)",
+      pointerEvents: "auto",
+      transformOrigin: this.__collapsed ? "top right" : "top left",
+    });
+    qx.event.Timer.once(
+      () => {
+        if (token !== this.__menuAnimToken) return;
+        this.__placeMenuPopup();
+        this.__setPopupAnimationStyles({
+          opacity: "1",
+          transform: "translateY(0) scale(1)",
+        });
+      },
+      this,
+      0,
+    );
+  }
+
+  private __setPopupAnimationStyles(styles: Record<string, string>): void {
+    const popupElement = this.__menuPopup.getContentElement() as any;
+    if (!popupElement?.setStyle) return;
+    for (const key in styles) {
+      if (!Object.prototype.hasOwnProperty.call(styles, key)) continue;
+      popupElement.setStyle(key, styles[key]);
+    }
   }
 
   private __bindOutsideClick(): void {
@@ -241,13 +285,14 @@ class BsSidebarAccount extends qx.ui.basic.Atom {
     let top: number;
 
     if (this.__collapsed) {
-      const preferredLeft = Math.round(triggerRect.right + gap);
+      const preferredLeft = Math.round(triggerRect.right - popupRect.width);
       left = Math.min(
         Math.max(8, preferredLeft),
         Math.max(8, viewportWidth - popupRect.width - 8),
       );
+      const preferredTop = Math.round(triggerRect.bottom + gap);
       top = Math.min(
-        Math.max(8, Math.round(triggerRect.top)),
+        Math.max(8, preferredTop),
         Math.max(8, viewportHeight - popupRect.height - 8),
       );
     } else {
@@ -320,11 +365,7 @@ class BsSidebarAccount extends qx.ui.basic.Atom {
     icon: InlineSvgIcon,
     action: string,
   ): BsSidebarButton {
-    const button = new BsSidebarButton(
-      `${label}`,
-      icon,
-      "btn-sm-outline",
-    );
+    const button = new BsSidebarButton(`${label}`, icon, "btn-sm-outline");
     button.setAllowGrowX(true);
     button.setHeight(40);
 
@@ -380,9 +421,9 @@ class BsSidebarAccount extends qx.ui.basic.Atom {
       "items-center",
       "gap-2",
       "rounded-md",
-      "px-0.5",
-      "py-1.5",
       "btn-sm-ghost",
+      this.__collapsed ? "px-0 py-0" : "px-0.5",
+      this.__collapsed ? "py-0" : "py-1.5",
       this.__collapsed ? "justify-center" : "justify-start",
       this.__className,
     ]
@@ -390,7 +431,7 @@ class BsSidebarAccount extends qx.ui.basic.Atom {
       .join(" ");
 
     this.__htmlButton.setHtml(`
-      <div class="p-1 relative" data-account-root data-account-open="${this.__isMenuOpen ? "true" : "false"}">
+      <div class="${this.__collapsed ? "p-0" : "p-1"} relative" data-account-root data-account-open="${this.__isMenuOpen ? "true" : "false"}">
         <button
           type="button"
           data-account-trigger

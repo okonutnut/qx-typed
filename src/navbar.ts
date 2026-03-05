@@ -25,7 +25,7 @@ class Navbar extends qx.ui.container.Composite {
     // SIDEBAR TRIGGER
     const collapseSidebarBtn = new BsButton(
       "",
-      new InlineSvgIcon("panel-left-close", 8),
+      new InlineSvgIcon("menu", 16),
       "btn-sm-icon-ghost p-1",
       "ghost",
     );

@@ -11,7 +11,9 @@ class MainPage extends qx.ui.container.Composite {
     const welcomeCard = new qx.ui.container.Composite(
       new qx.ui.layout.VBox(8).set({ alignX: "center" }),
     );
-    welcomeCard.setWidth(520);
+    welcomeCard.setMaxWidth(520);
+    welcomeCard.setMinWidth(0);
+    welcomeCard.setAllowGrowX(true);
     welcomeCard.setPadding(24);
     welcomeCard.setBackgroundColor(AppColors.background());
 
@@ -27,6 +29,7 @@ class MainPage extends qx.ui.container.Composite {
     const subtitle = new qx.ui.basic.Label(
       "Your workspace is ready. Use the sidebar to explore components and pages.",
     );
+    subtitle.setWidth(400);
     subtitle.setTextColor(AppColors.mutedForeground());
     subtitle.setTextAlign("center");
     subtitle.setWrap(true);
@@ -34,6 +37,16 @@ class MainPage extends qx.ui.container.Composite {
 
     welcomeCard.add(title);
     welcomeCard.add(subtitle);
+
+    const syncWelcomeCardWidth = () => {
+      const width = Math.max(
+        240,
+        Math.min(520, qx.bom.Viewport.getWidth() - 32),
+      );
+      welcomeCard.setWidth(width);
+    };
+    qx.event.Registration.addListener(window, "resize", syncWelcomeCardWidth);
+    syncWelcomeCardWidth();
 
     center.add(welcomeCard);
     this.add(center);

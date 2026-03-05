@@ -8,6 +8,7 @@ class BsInput extends qx.ui.basic.Atom {
   private __value: string;
   private __placeholder: string;
   private __className: string;
+  private __leadingHtml = "";
   private __inputEl: HTMLInputElement | null = null;
 
   constructor(value?: string, placeholder?: string, className?: string) {
@@ -71,12 +72,14 @@ class BsInput extends qx.ui.basic.Atom {
   }
 
   private __render(): void {
+    const hasLeadingIcon = this.__leadingHtml.length > 0;
     const classes = [
       "input",
       "bg-card",
       "text-foreground",
       "border-border",
       "placeholder:text-muted-foreground",
+      hasLeadingIcon ? "pl-9" : "",
       this.__className,
     ]
       .filter(Boolean)
@@ -86,7 +89,12 @@ class BsInput extends qx.ui.basic.Atom {
     const tabIndexAttr = 'tabindex="-1"';
 
     this.__htmlInput.setHtml(`
-        <div class="p-1">
+        <div class="relative p-1">
+            ${
+              hasLeadingIcon
+                ? `<span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">${this.__leadingHtml}</span>`
+                : ""
+            }
             <input
             type="text"
             class="${classes}"
@@ -113,6 +121,12 @@ class BsInput extends qx.ui.basic.Atom {
     this.__placeholder = value ?? "";
     if (this.__inputEl) this.__inputEl.placeholder = this.__placeholder;
     else this.__render();
+    return this;
+  }
+
+  public setLeadingHtml(html: string): this {
+    this.__leadingHtml = html ?? "";
+    this.__render();
     return this;
   }
 

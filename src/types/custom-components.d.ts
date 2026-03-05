@@ -36,6 +36,7 @@ interface BsInput {
   getValue(): string;
   setValue(value: string): this;
   setPlaceholder(value: string): this;
+  setLeadingHtml(html: string): this;
   onInput(handler: (value: string) => void): this;
 }
 
@@ -80,6 +81,7 @@ interface BsSidebarAccount {
 interface BsSidebarButton {
   setActive(active: boolean): this;
   setCollapsed(collapsed: boolean): this;
+  setTrailingHtml(html: string): this;
   onClick(handler: () => void): this;
 }
 

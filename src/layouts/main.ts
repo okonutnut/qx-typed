@@ -24,10 +24,64 @@ class MainLayout extends qx.ui.container.Composite {
       new qx.ui.layout.VBox(),
     );
 
+    const mobileTopBar = new qx.ui.container.Composite(
+      new qx.ui.layout.HBox().set({ alignY: "middle" }),
+    );
+    mobileTopBar.set({
+      paddingTop: 8,
+      paddingRight: 6,
+      paddingBottom: 8,
+      paddingLeft: 10,
+      minHeight: 48,
+      backgroundColor: AppColors.background(),
+    });
+    mobileTopBar.setDecorator(
+      new qx.ui.decoration.Decorator().set({
+        widthBottom: 1,
+        styleBottom: "solid",
+        colorBottom: AppColors.border(),
+      }),
+    );
+
+    const mobileSchoolLogo = new qx.ui.basic.Image("resource/app/ac_logo.png");
+    mobileSchoolLogo.set({
+      scale: true,
+      width: 32,
+      height: 32,
+    });
+    mobileTopBar.add(mobileSchoolLogo);
+    mobileTopBar.add(new qx.ui.core.Spacer(), { flex: 1 });
+
+    const mobileAccount = new BsSidebarAccount(
+      globalThis.username || "User",
+      "Student",
+      "resource/app/user.png",
+      "RB",
+      "px-0 py-0",
+    );
+    mobileAccount.setCollapsed(true);
+    mobileAccount.setAllowGrowX(false);
+    mobileAccount.setAlignY("middle");
+    const mobileAccountSlot = new qx.ui.container.Composite(
+      new qx.ui.layout.Grow(),
+    );
+    mobileAccountSlot.setAllowGrowX(false);
+    mobileAccountSlot.setAlignY("middle");
+    mobileAccountSlot.setWidth(40);
+    mobileAccountSlot.setHeight(40);
+    mobileAccountSlot.add(mobileAccount);
+    mobileAccount.onAction((action) => {
+      if (action === "logout") this.fireEvent("logout");
+    });
+    mobileTopBar.add(mobileAccountSlot);
+    mobileTopBar.exclude();
+
     const desktopShell = new qx.ui.container.Composite(new qx.ui.layout.HBox());
 
     const mountDesktop = () => {
       drawer?.close();
+      sidebar.setDrawerMode(false);
+      mobileTopBar.exclude();
 
       desktopShell.removeAll();
       desktopShell.add(sidebar);
@@ -39,7 +93,9 @@ class MainLayout extends qx.ui.container.Composite {
 
     const mountMobile = () => {
       sidebar.setCollapsed(false);
-      drawer = new BsDrawer(contentContainer, sidebar, 230);
+      sidebar.setDrawerMode(true);
+      mobileTopBar.show();
+      drawer = new BsDrawer(contentContainer, sidebar);
 
       this.removeAll();
       this.add(drawer);
@@ -53,6 +109,7 @@ class MainLayout extends qx.ui.container.Composite {
         sidebar.setCollapsed(isSidebarCollapsed);
       }
     });
+    contentContainer.add(mobileTopBar);
     contentContainer.add(navbar);
 
     const mainContentContainer = new qx.ui.container.Composite(
@@ -80,17 +137,27 @@ class MainLayout extends qx.ui.container.Composite {
     mainContentContainer.setPadding(10);
     mainContentContainer.add(content, { edge: 0 });
 
-    sidebar.addListener("select", (ev: qx.event.type.Data) => {
-      const label = ev.getData() as string;
-      const nextPage = getPage(label);
-      if (!nextPage || nextPage === currentPage) return;
+    globalThis.setContent = (contentOrFactory, title) => {
+      const nextPage =
+        typeof contentOrFactory === "function"
+          ? contentOrFactory()
+          : contentOrFactory;
+      if (nextPage === currentPage) return;
 
       mainContentContainer.removeAll();
       mainContentContainer.add(nextPage, { edge: 0 });
       currentPage = nextPage;
 
-      navbar.setPageTitle(label);
+      if (title) navbar.setPageTitle(title);
       if (isMobileMode) drawer?.close();
+    };
+
+    sidebar.addListener("select", (ev: qx.event.type.Data) => {
+      const label = ev.getData() as string;
+      const nextPage = getPage(label);
+      if (!nextPage) return;
+
+      globalThis.setContent(nextPage, label);
     });
 
     sidebar.addListener("action", (ev: qx.event.type.Data) => {
