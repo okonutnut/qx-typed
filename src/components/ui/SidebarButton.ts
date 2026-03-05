@@ -10,6 +10,7 @@ class BsSidebarButton extends qx.ui.basic.Atom {
   private __trailingHtml = "";
   private __active = false;
   private __collapsed = false;
+  private __centered = false;
   private __buttonEl: HTMLButtonElement | null = null;
   private __renderPending = false;
 
@@ -60,7 +61,11 @@ class BsSidebarButton extends qx.ui.basic.Atom {
     const activeClass = this.__active
       ? "font-semibold btn-sm-primary"
       : "btn-sm-ghost";
-    const layoutClass = this.__collapsed ? "justify-center" : "justify-start";
+    const layoutClass = this.__collapsed
+      ? "justify-center"
+      : this.__centered
+        ? "justify-center relative"
+        : "justify-start";
     const classes = [
       "w-full",
       "items-center",
@@ -69,6 +74,7 @@ class BsSidebarButton extends qx.ui.basic.Atom {
       "duration-200",
       "ease-in-out",
       "border-sidebar-border",
+      "select-none",
       layoutClass,
       activeClass,
       this.__className,
@@ -76,13 +82,18 @@ class BsSidebarButton extends qx.ui.basic.Atom {
       .filter(Boolean)
       .join(" ");
 
+    const centeredIconPart =
+      this.__centered && this.__iconHtml
+        ? `<span style="position:absolute;left:8px;display:flex;align-items:center">${this.__iconHtml}</span>`
+        : iconPart;
+
     this.__htmlButton.setHtml(`
       <div class="p-1">
         <button
           type="button"
           class="${classes}"
         >
-          ${iconPart}
+          ${centeredIconPart}
           ${textPart}
           ${trailingPart}
         </button>
@@ -108,6 +119,20 @@ class BsSidebarButton extends qx.ui.basic.Atom {
 
   public onClick(handler: () => void): this {
     this.addListener("execute", handler);
+    return this;
+  }
+
+  public setText(text: string): this {
+    if (this.__buttonText === text) return this;
+    this.__buttonText = text;
+    this.__scheduleRender();
+    return this;
+  }
+
+  public setCentered(centered: boolean): this {
+    if (this.__centered === centered) return this;
+    this.__centered = centered;
+    this.__scheduleRender();
     return this;
   }
 

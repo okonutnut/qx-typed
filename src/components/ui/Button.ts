@@ -84,7 +84,7 @@ class BsButton extends qx.ui.basic.Atom {
     const iconPart = this.__iconHtml ? `<span>${this.__iconHtml}</span>` : "";
     const tabIndexAttr = 'tabindex="-1"';
     const variantClass = this.__resolveVariantClass();
-    const classes = ["w-full", this.__className, variantClass]
+    const classes = ["w-full", "select-none", this.__className, variantClass]
       .filter(Boolean)
       .join(" ");
 

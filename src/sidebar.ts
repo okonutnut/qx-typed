@@ -14,6 +14,7 @@ class Sidebar extends qx.ui.container.Composite {
   private __itemsViewport: qx.ui.container.Composite;
   private __listContainer: qx.ui.container.Composite | null = null;
   private __footer: BsSidebarAccount;
+  private __backButton!: BsSidebarButton;
   private __buttons: BsSidebarButton[] = [];
   private __buttonStates = new Map<string, BsSidebarButton>();
   private __rootItems: SidebarItem[];
@@ -95,6 +96,8 @@ class Sidebar extends qx.ui.container.Composite {
     );
     backButton.setAllowGrowX(true);
     backButton.setWidth(230);
+    backButton.setCentered(true);
+    this.__backButton = backButton;
     backButton.onClick(() => {
       if (this.__stack.length === 0 || this.__isAnimating) return;
       this.__stack.pop();
@@ -186,8 +189,13 @@ class Sidebar extends qx.ui.container.Composite {
       !this.__collapsed &&
       this.__searchQuery.length === 0 &&
       this.__stack.length > 0;
-    if (shouldShow) this.__backContainer.show();
-    else this.__backContainer.exclude();
+    if (shouldShow) {
+      const parentLabel = this.__stack[this.__stack.length - 1].label;
+      this.__backButton.setText(parentLabel);
+      this.__backContainer.show();
+    } else {
+      this.__backContainer.exclude();
+    }
   }
 
   private __renderVisibleItems(animated: boolean): void {
