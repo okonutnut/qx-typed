@@ -11,7 +11,7 @@ class SubjectsPage extends qx.ui.container.Composite {
 
     const toolbar = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
     const addBtn = new BsButton(
-      "Add Subject",
+      "Add New",
       new InlineSvgIcon("plus", 16),
       "btn-sm",
       "primary",
@@ -22,8 +22,7 @@ class SubjectsPage extends qx.ui.container.Composite {
     const refreshBtn = new BsButton(
       "Refresh",
       new InlineSvgIcon("refresh-cw", 16),
-      "btn-sm",
-      "outline",
+      "btn-sm-outline",
     );
     refreshBtn.onClick(() => this.__loadData());
     toolbar.add(refreshBtn);
@@ -47,14 +46,21 @@ class SubjectsPage extends qx.ui.container.Composite {
     this.add(this.__table, { flex: 1 });
 
     const actionBar = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
-    const editBtn = new BsButton("Edit", undefined, "btn-sm", "outline");
+    const editBtn = new BsButton(
+      "Edit",
+      undefined,
+      "btn-sm-outline",
+      "outline",
+    );
+    editBtn.setWidth(120);
     editBtn.onClick(() => this.__editSelected());
     const deleteBtn = new BsButton(
       "Delete",
       undefined,
-      "btn-sm",
+      "btn-sm-destructive",
       "destructive",
     );
+    deleteBtn.setWidth(120);
     deleteBtn.onClick(() => this.__deleteSelected());
     actionBar.add(editBtn);
     actionBar.add(deleteBtn);

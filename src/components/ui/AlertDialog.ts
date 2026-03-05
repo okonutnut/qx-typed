@@ -80,13 +80,13 @@ class BsAlertDialog {
     const footer = document.createElement("footer");
 
     const cancelBtn = document.createElement("button");
-    cancelBtn.className = "btn-outline";
+    cancelBtn.className = "btn-sm-primary";
     cancelBtn.textContent = this.__cancelLabel;
     cancelBtn.type = "button";
     cancelBtn.onclick = () => dialog.close();
 
     const continueBtn = document.createElement("button");
-    continueBtn.className = "btn-primary";
+    continueBtn.className = "btn-sm-primary";
     continueBtn.textContent = this.__continueLabel;
     continueBtn.type = "button";
     continueBtn.onclick = () => {

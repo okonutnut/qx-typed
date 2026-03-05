@@ -96,7 +96,8 @@ class LoginLayout extends qx.ui.container.Composite {
         });
     };
 
-    const submit = new BsButton("Sign in", undefined, undefined, "primary");
+    const submit = new BsButton("Sign in", undefined, "w-full", "primary");
+    submit.setAllowGrowX(true);
     submit.onClick(triggerLogin);
     card.add(submit);
 
