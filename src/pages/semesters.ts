@@ -10,14 +10,16 @@ class SemestersPage extends qx.ui.container.Composite {
     super(new qx.ui.layout.VBox(10));
 
     const toolbar = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
-    const addBtn = new BsButton(
-      "Add Semester",
-      new InlineSvgIcon("plus", 16),
-      "btn-sm",
-      "primary",
-    );
-    addBtn.onClick(() => this.__showFormDialog());
-    toolbar.add(addBtn);
+    if (isAdmin()) {
+      const addBtn = new BsButton(
+        "Add Semester",
+        new InlineSvgIcon("plus", 16),
+        "btn-sm",
+        "primary",
+      );
+      addBtn.onClick(() => this.__showFormDialog());
+      toolbar.add(addBtn);
+    }
 
     const refreshBtn = new BsButton(
       "Refresh",
@@ -43,27 +45,29 @@ class SemestersPage extends qx.ui.container.Composite {
       .setSelectionMode(qx.ui.table.selection.Model.SINGLE_SELECTION);
     this.add(this.__table, { flex: 1 });
 
-    const actionBar = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
-    const activateBtn = new BsButton(
-      "Set Active",
-      undefined,
-      "btn-sm",
-      "primary",
-    );
-    activateBtn.onClick(() => this.__activateSelected());
-    const editBtn = new BsButton("Edit", undefined, "btn-sm", "outline");
-    editBtn.onClick(() => this.__editSelected());
-    const deleteBtn = new BsButton(
-      "Delete",
-      undefined,
-      "btn-sm",
-      "destructive",
-    );
-    deleteBtn.onClick(() => this.__deleteSelected());
-    actionBar.add(activateBtn);
-    actionBar.add(editBtn);
-    actionBar.add(deleteBtn);
-    this.add(actionBar);
+    if (isAdmin()) {
+      const actionBar = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
+      const activateBtn = new BsButton(
+        "Set Active",
+        undefined,
+        "btn-sm",
+        "primary",
+      );
+      activateBtn.onClick(() => this.__activateSelected());
+      const editBtn = new BsButton("Edit", undefined, "btn-sm", "outline");
+      editBtn.onClick(() => this.__editSelected());
+      const deleteBtn = new BsButton(
+        "Delete",
+        undefined,
+        "btn-sm",
+        "destructive",
+      );
+      deleteBtn.onClick(() => this.__deleteSelected());
+      actionBar.add(activateBtn);
+      actionBar.add(editBtn);
+      actionBar.add(deleteBtn);
+      this.add(actionBar);
+    }
 
     this.__loadData();
   }
@@ -106,8 +110,7 @@ class SemestersPage extends qx.ui.container.Composite {
     form.add(new qx.ui.basic.Label("School Year"));
     form.add(yearInput);
 
-    const dialog = new BsAlertDialog({
-      id: isEdit ? "edit-semester-dlg" : "add-semester-dlg",
+    BsAlertDialog.show({
       title: isEdit ? "Edit Semester" : "Add Semester",
       children: form,
       continueLabel: isEdit ? "Save" : "Add",
@@ -130,7 +133,6 @@ class SemestersPage extends qx.ui.container.Composite {
           .catch((err: ApiError) => alert(err.message));
       },
     });
-    dialog.show();
   }
 
   private __activateSelected(): void {
@@ -152,8 +154,7 @@ class SemestersPage extends qx.ui.container.Composite {
     const row = this.__getSelectedRow();
     if (!row) return;
 
-    const dialog = new BsAlertDialog({
-      id: "delete-semester-dlg",
+    BsAlertDialog.show({
       title: "Delete Semester",
       description: `Are you sure you want to delete "${row.name} (${row.school_year})"?`,
       continueLabel: "Delete",
@@ -164,6 +165,5 @@ class SemestersPage extends qx.ui.container.Composite {
           .catch((err: ApiError) => alert(err.message));
       },
     });
-    dialog.show();
   }
 }

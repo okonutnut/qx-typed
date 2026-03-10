@@ -58,6 +58,7 @@ function checkConflicts(PDO $db, int $semesterId, int $facultyId, int $roomId, s
 
 switch ($method) {
     case 'GET':
+        requireAuth();
         $where  = [];
         $params = [];
 

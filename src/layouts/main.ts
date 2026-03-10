@@ -54,7 +54,7 @@ class MainLayout extends qx.ui.container.Composite {
 
     const mobileAccount = new BsSidebarAccount(
       globalThis.username || "User",
-      "Student",
+      formatRoleLabel(globalThis.userRole),
       "resource/app/user.png",
       "RB",
       "px-0 py-0",

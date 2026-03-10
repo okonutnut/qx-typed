@@ -1,5 +1,4 @@
 type BsAlertDialogConfig = {
-  id: string;
   title: string;
   description?: string;
   cancelLabel?: string;
@@ -9,103 +8,129 @@ type BsAlertDialogConfig = {
   footerButtons?: "ok" | "ok-cancel" | "cancel";
 };
 
+/**
+ * Singleton modal dialog. One shared <dialog> element is reused for every
+ * invocation — content, title, and buttons are swapped dynamically.
+ * Footer buttons use event delegation via data-action attributes.
+ */
 class BsAlertDialog {
-  private __id: string;
-  private __title: string;
-  private __description: string;
-  private __cancelLabel: string;
-  private __continueLabel: string;
-  private __onContinue?: () => void;
-  private __children?: qx.ui.core.Widget;
-  private __bodyRoot?: qx.ui.root.Inline;
-  private __footerButtons: "ok" | "ok-cancel" | "cancel";
+  private static __dialog: HTMLDialogElement | null = null;
+  private static __titleEl: HTMLHeadingElement | null = null;
+  private static __body: HTMLDivElement | null = null;
+  private static __footer: HTMLElement | null = null;
+  private static __bodyRoot: qx.ui.root.Inline | null = null;
+  private static __onContinue: (() => void) | null = null;
 
-  constructor(config: BsAlertDialogConfig) {
-    this.__id = config.id;
-    this.__title = config.title;
-    this.__description = config.description ?? "";
-    this.__cancelLabel = config.cancelLabel ?? "Cancel";
-    this.__continueLabel = config.continueLabel ?? "Continue";
-    this.__onContinue = config.onContinue;
-    this.__children = config.children;
-    this.__footerButtons = config.footerButtons ?? "ok-cancel";
-  }
+  private constructor() {}
 
-  public show(): void {
-    const dialog = this.__getOrCreateDialog();
+  static show(config: BsAlertDialogConfig): void {
+    const dialog = BsAlertDialog.__getOrCreateDialog();
+
+    // Dispose previous qooxdoo widget tree
+    BsAlertDialog.__disposeBody();
+
+    // Title
+    BsAlertDialog.__titleEl!.textContent = config.title;
+
+    // Body
+    const body = BsAlertDialog.__body!;
+    if (config.children) {
+      dialog.removeAttribute("aria-describedby");
+      const bodyHost = document.createElement("div");
+      body.appendChild(bodyHost);
+
+      BsAlertDialog.__bodyRoot = new qx.ui.root.Inline(bodyHost);
+      BsAlertDialog.__bodyRoot.setLayout(new qx.ui.layout.Grow());
+      BsAlertDialog.__bodyRoot.add(config.children);
+    } else if (config.description) {
+      dialog.setAttribute("aria-describedby", "bs-dialog-desc");
+      const p = document.createElement("p");
+      p.id = "bs-dialog-desc";
+      p.textContent = config.description;
+      body.appendChild(p);
+    }
+
+    // Footer buttons (rebuilt each time for correct labels)
+    const footer = BsAlertDialog.__footer!;
+    footer.innerHTML = "";
+    const buttons = config.footerButtons ?? "ok-cancel";
+    const cancelLabel = config.cancelLabel ?? "Cancel";
+    const continueLabel = config.continueLabel ?? "Continue";
+
+    if (buttons === "ok-cancel" || buttons === "cancel") {
+      const cancelBtn = document.createElement("button");
+      cancelBtn.className = "btn-sm-primary";
+      cancelBtn.textContent = cancelLabel;
+      cancelBtn.type = "button";
+      cancelBtn.dataset.action = "cancel";
+      footer.appendChild(cancelBtn);
+    }
+    if (buttons === "ok-cancel" || buttons === "ok") {
+      const continueBtn = document.createElement("button");
+      continueBtn.className = "btn-sm-primary";
+      continueBtn.textContent = continueLabel;
+      continueBtn.type = "button";
+      continueBtn.dataset.action = "continue";
+      footer.appendChild(continueBtn);
+    }
+
+    BsAlertDialog.__onContinue = config.onContinue ?? null;
     dialog.showModal();
   }
 
-  private __getOrCreateDialog(): HTMLDialogElement {
-    const existing = document.getElementById(
-      this.__id,
-    ) as HTMLDialogElement | null;
-    if (existing) return existing;
+  private static __disposeBody(): void {
+    if (BsAlertDialog.__bodyRoot) {
+      BsAlertDialog.__bodyRoot.removeAll();
+      BsAlertDialog.__bodyRoot.destroy();
+      BsAlertDialog.__bodyRoot = null;
+    }
+    BsAlertDialog.__body!.innerHTML = "";
+  }
 
-    const titleId = `${this.__id}-title`;
-    const descriptionId = `${this.__id}-description`;
+  private static __getOrCreateDialog(): HTMLDialogElement {
+    if (BsAlertDialog.__dialog) return BsAlertDialog.__dialog;
 
     const dialog = document.createElement("dialog");
-    dialog.id = this.__id;
+    dialog.id = "bs-global-dialog";
     dialog.className = "dialog";
-    dialog.setAttribute("aria-labelledby", titleId);
-    if (!this.__children && this.__description) {
-      dialog.setAttribute("aria-describedby", descriptionId);
-    }
+    dialog.setAttribute("aria-labelledby", "bs-dialog-title");
 
     const wrapper = document.createElement("div");
 
     const header = document.createElement("header");
     const title = document.createElement("h2");
-    title.id = titleId;
-    title.textContent = this.__title;
+    title.id = "bs-dialog-title";
     header.appendChild(title);
 
     const body = document.createElement("div");
-
-    if (this.__children) {
-      const bodyHost = document.createElement("div");
-      body.appendChild(bodyHost);
-
-      this.__bodyRoot = new qx.ui.root.Inline(bodyHost);
-      this.__bodyRoot.setLayout(new qx.ui.layout.Grow());
-      this.__bodyRoot.add(this.__children);
-    } else if (this.__description) {
-      const description = document.createElement("p");
-      description.id = descriptionId;
-      description.textContent = this.__description;
-      body.appendChild(description);
-    }
-
     const footer = document.createElement("footer");
-
-    const cancelBtn = document.createElement("button");
-    cancelBtn.className = "btn-sm-primary";
-    cancelBtn.textContent = this.__cancelLabel;
-    cancelBtn.type = "button";
-    cancelBtn.onclick = () => dialog.close();
-
-    const continueBtn = document.createElement("button");
-    continueBtn.className = "btn-sm-primary";
-    continueBtn.textContent = this.__continueLabel;
-    continueBtn.type = "button";
-    continueBtn.onclick = () => {
-      dialog.close();
-      this.__onContinue?.();
-    };
-
-    if (this.__footerButtons === "ok-cancel" || this.__footerButtons === "cancel") {
-      footer.appendChild(cancelBtn);
-    }
-    if (this.__footerButtons === "ok-cancel" || this.__footerButtons === "ok") {
-      footer.appendChild(continueBtn);
-    }
 
     wrapper.appendChild(header);
     wrapper.appendChild(body);
     wrapper.appendChild(footer);
     dialog.appendChild(wrapper);
     document.body.appendChild(dialog);
+
+    // Event delegation — single handler for all footer button clicks
+    footer.addEventListener("click", (e) => {
+      const target = (e.target as HTMLElement).closest<HTMLButtonElement>(
+        "button[data-action]",
+      );
+      if (!target) return;
+
+      const action = target.dataset.action;
+      if (action === "cancel") {
+        dialog.close();
+      } else if (action === "continue") {
+        dialog.close();
+        BsAlertDialog.__onContinue?.();
+      }
+    });
+
+    BsAlertDialog.__dialog = dialog;
+    BsAlertDialog.__titleEl = title;
+    BsAlertDialog.__body = body;
+    BsAlertDialog.__footer = footer;
 
     return dialog;
   }

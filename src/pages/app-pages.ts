@@ -2,6 +2,7 @@ type PageDefinition = {
   label: string;
   iconName: string;
   factory?: () => qx.ui.core.Widget;
+  allowedRoles?: UserRole[];
 };
 
 type SidebarDefinition = {
@@ -15,26 +16,31 @@ const PAGE_DEFINITIONS: PageDefinition[] = [
     label: "Subjects",
     iconName: "book-open",
     factory: () => new SubjectsPage(),
+    allowedRoles: ["admin", "faculty"],
   },
   {
     label: "Faculty",
     iconName: "users",
     factory: () => new FacultyPage(),
+    allowedRoles: ["admin", "faculty"],
   },
   {
     label: "Rooms",
     iconName: "door-open",
     factory: () => new RoomsPage(),
+    allowedRoles: ["admin", "faculty"],
   },
   {
     label: "Semesters",
     iconName: "calendar",
     factory: () => new SemestersPage(),
+    allowedRoles: ["admin"],
   },
   {
     label: "Class Schedules",
     iconName: "clock",
     factory: () => new SchedulesPage(),
+    allowedRoles: ["admin", "faculty"],
   },
 ];
 

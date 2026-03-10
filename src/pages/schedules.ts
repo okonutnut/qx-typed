@@ -29,14 +29,16 @@ class SchedulesPage extends qx.ui.container.Composite {
 
     toolbar.add(new qx.ui.core.Spacer(), { flex: 1 });
 
-    const addBtn = new BsButton(
-      "Add Schedule",
-      new InlineSvgIcon("plus", 16),
-      "btn-sm",
-      "primary",
-    );
-    addBtn.onClick(() => this.__showFormDialog());
-    toolbar.add(addBtn);
+    if (isAdmin()) {
+      const addBtn = new BsButton(
+        "Add Schedule",
+        new InlineSvgIcon("plus", 16),
+        "btn-sm",
+        "primary",
+      );
+      addBtn.onClick(() => this.__showFormDialog());
+      toolbar.add(addBtn);
+    }
 
     const refreshBtn = new BsButton(
       "Refresh",
@@ -68,20 +70,22 @@ class SchedulesPage extends qx.ui.container.Composite {
       .setSelectionMode(qx.ui.table.selection.Model.SINGLE_SELECTION);
     this.add(this.__table, { flex: 1 });
 
-    // Action bar
-    const actionBar = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
-    const editBtn = new BsButton("Edit", undefined, "btn-sm", "outline");
-    editBtn.onClick(() => this.__editSelected());
-    const deleteBtn = new BsButton(
-      "Delete",
-      undefined,
-      "btn-sm",
-      "destructive",
-    );
-    deleteBtn.onClick(() => this.__deleteSelected());
-    actionBar.add(editBtn);
-    actionBar.add(deleteBtn);
-    this.add(actionBar);
+    // Action bar (admin only)
+    if (isAdmin()) {
+      const actionBar = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
+      const editBtn = new BsButton("Edit", undefined, "btn-sm", "outline");
+      editBtn.onClick(() => this.__editSelected());
+      const deleteBtn = new BsButton(
+        "Delete",
+        undefined,
+        "btn-sm",
+        "destructive",
+      );
+      deleteBtn.onClick(() => this.__deleteSelected());
+      actionBar.add(editBtn);
+      actionBar.add(deleteBtn);
+      this.add(actionBar);
+    }
 
     this.__loadAll();
   }
@@ -228,8 +232,7 @@ class SchedulesPage extends qx.ui.container.Composite {
     form.add(new qx.ui.basic.Label("End Time"));
     form.add(endInput);
 
-    const dialog = new BsAlertDialog({
-      id: isEdit ? "edit-schedule-dlg" : "add-schedule-dlg",
+    BsAlertDialog.show({
       title: isEdit ? "Edit Schedule" : "Add Schedule",
       children: form,
       continueLabel: isEdit ? "Save" : "Add",
@@ -281,7 +284,6 @@ class SchedulesPage extends qx.ui.container.Composite {
           });
       },
     });
-    dialog.show();
   }
 
   private __editSelected(): void {
@@ -294,8 +296,7 @@ class SchedulesPage extends qx.ui.container.Composite {
     const row = this.__getSelectedRow();
     if (!row) return;
 
-    const dialog = new BsAlertDialog({
-      id: "delete-schedule-dlg",
+    BsAlertDialog.show({
       title: "Delete Schedule",
       description: `Delete ${row.subject_code} — ${row.faculty_name} on ${row.day_of_week} ${row.start_time}-${row.end_time}?`,
       continueLabel: "Delete",
@@ -306,6 +307,5 @@ class SchedulesPage extends qx.ui.container.Composite {
           .catch((err: ApiError) => alert(err.message));
       },
     });
-    dialog.show();
   }
 }

@@ -14,6 +14,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'GET':
+        requireAuth();
         $rows = $db->query('SELECT * FROM rooms ORDER BY building, name')->fetchAll();
         jsonResponse($rows);
         break;

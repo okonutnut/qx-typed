@@ -10,14 +10,16 @@ class FacultyPage extends qx.ui.container.Composite {
     super(new qx.ui.layout.VBox(10));
 
     const toolbar = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
-    const addBtn = new BsButton(
-      "Add Faculty",
-      new InlineSvgIcon("plus", 16),
-      "btn-sm",
-      "primary",
-    );
-    addBtn.onClick(() => this.__showFormDialog());
-    toolbar.add(addBtn);
+    if (isAdmin()) {
+      const addBtn = new BsButton(
+        "Add Faculty",
+        new InlineSvgIcon("plus", 16),
+        "btn-sm",
+        "primary",
+      );
+      addBtn.onClick(() => this.__showFormDialog());
+      toolbar.add(addBtn);
+    }
 
     const refreshBtn = new BsButton(
       "Refresh",
@@ -46,27 +48,29 @@ class FacultyPage extends qx.ui.container.Composite {
       .setSelectionMode(qx.ui.table.selection.Model.SINGLE_SELECTION);
     this.add(this.__table, { flex: 1 });
 
-    const actionBar = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
-    const editBtn = new BsButton("Edit", undefined, "btn-sm", "outline");
-    editBtn.onClick(() => this.__editSelected());
-    const deleteBtn = new BsButton(
-      "Delete",
-      undefined,
-      "btn-sm",
-      "destructive",
-    );
-    deleteBtn.onClick(() => this.__deleteSelected());
-    const assignBtn = new BsButton(
-      "Assign Subjects",
-      undefined,
-      "btn-sm",
-      "secondary",
-    );
-    assignBtn.onClick(() => this.__assignSubjects());
-    actionBar.add(editBtn);
-    actionBar.add(deleteBtn);
-    actionBar.add(assignBtn);
-    this.add(actionBar);
+    if (isAdmin()) {
+      const actionBar = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
+      const editBtn = new BsButton("Edit", undefined, "btn-sm", "outline");
+      editBtn.onClick(() => this.__editSelected());
+      const deleteBtn = new BsButton(
+        "Delete",
+        undefined,
+        "btn-sm",
+        "destructive",
+      );
+      deleteBtn.onClick(() => this.__deleteSelected());
+      const assignBtn = new BsButton(
+        "Assign Subjects",
+        undefined,
+        "btn-sm",
+        "secondary",
+      );
+      assignBtn.onClick(() => this.__assignSubjects());
+      actionBar.add(editBtn);
+      actionBar.add(deleteBtn);
+      actionBar.add(assignBtn);
+      this.add(actionBar);
+    }
 
     this.__loadData();
   }
@@ -121,8 +125,7 @@ class FacultyPage extends qx.ui.container.Composite {
     form.add(new qx.ui.basic.Label("Specialization"));
     form.add(specInput);
 
-    const dialog = new BsAlertDialog({
-      id: isEdit ? "edit-faculty-dlg" : "add-faculty-dlg",
+    BsAlertDialog.show({
       title: isEdit ? "Edit Faculty" : "Add Faculty",
       children: form,
       continueLabel: isEdit ? "Save" : "Add",
@@ -143,7 +146,6 @@ class FacultyPage extends qx.ui.container.Composite {
           .catch((err: ApiError) => alert(err.message));
       },
     });
-    dialog.show();
   }
 
   private __editSelected(): void {
@@ -156,8 +158,7 @@ class FacultyPage extends qx.ui.container.Composite {
     const row = this.__getSelectedRow();
     if (!row) return;
 
-    const dialog = new BsAlertDialog({
-      id: "delete-faculty-dlg",
+    BsAlertDialog.show({
       title: "Delete Faculty",
       description: `Are you sure you want to delete "${row.full_name}"?`,
       continueLabel: "Delete",
@@ -168,7 +169,6 @@ class FacultyPage extends qx.ui.container.Composite {
           .catch((err: ApiError) => alert(err.message));
       },
     });
-    dialog.show();
   }
 
   private __assignSubjects(): void {
@@ -289,14 +289,12 @@ class FacultyPage extends qx.ui.container.Composite {
         container.add(addAssignBtn);
       }
 
-      const dialog = new BsAlertDialog({
-        id: "assign-subjects-dlg",
+      BsAlertDialog.show({
         title: "Assign Subjects",
         children: container,
         footerButtons: "cancel",
         cancelLabel: "Close",
       });
-      dialog.show();
     });
   }
 }

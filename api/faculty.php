@@ -15,6 +15,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'GET':
+        requireAuth();
         $id = $_GET['id'] ?? null;
         if ($id !== null) {
             $stmt = $db->prepare('SELECT * FROM faculty WHERE id = :id');

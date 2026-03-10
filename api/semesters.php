@@ -16,6 +16,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'GET':
+        requireAuth();
         if (!empty($_GET['active'])) {
             $row = $db->query('SELECT * FROM semesters WHERE is_active = 1 LIMIT 1')->fetch();
             jsonResponse($row ?: null);

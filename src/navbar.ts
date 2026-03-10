@@ -107,7 +107,7 @@ class Navbar extends qx.ui.container.Composite {
     );
     this.addListener("action", (ev: qx.event.type.Data) => {
       if ((ev.getData() as string) === "show-about-dialog") {
-        aboutAlertDialog.show();
+        showAboutDialog();
       }
     });
 

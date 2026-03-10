@@ -10,14 +10,16 @@ class RoomsPage extends qx.ui.container.Composite {
     super(new qx.ui.layout.VBox(10));
 
     const toolbar = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
-    const addBtn = new BsButton(
-      "Add Room",
-      new InlineSvgIcon("plus", 16),
-      "btn-sm",
-      "primary",
-    );
-    addBtn.onClick(() => this.__showFormDialog());
-    toolbar.add(addBtn);
+    if (isAdmin()) {
+      const addBtn = new BsButton(
+        "Add Room",
+        new InlineSvgIcon("plus", 16),
+        "btn-sm",
+        "primary",
+      );
+      addBtn.onClick(() => this.__showFormDialog());
+      toolbar.add(addBtn);
+    }
 
     const refreshBtn = new BsButton(
       "Refresh",
@@ -40,19 +42,21 @@ class RoomsPage extends qx.ui.container.Composite {
       .setSelectionMode(qx.ui.table.selection.Model.SINGLE_SELECTION);
     this.add(this.__table, { flex: 1 });
 
-    const actionBar = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
-    const editBtn = new BsButton("Edit", undefined, "btn-sm", "outline");
-    editBtn.onClick(() => this.__editSelected());
-    const deleteBtn = new BsButton(
-      "Delete",
-      undefined,
-      "btn-sm",
-      "destructive",
-    );
-    deleteBtn.onClick(() => this.__deleteSelected());
-    actionBar.add(editBtn);
-    actionBar.add(deleteBtn);
-    this.add(actionBar);
+    if (isAdmin()) {
+      const actionBar = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
+      const editBtn = new BsButton("Edit", undefined, "btn-sm", "outline");
+      editBtn.onClick(() => this.__editSelected());
+      const deleteBtn = new BsButton(
+        "Delete",
+        undefined,
+        "btn-sm",
+        "destructive",
+      );
+      deleteBtn.onClick(() => this.__deleteSelected());
+      actionBar.add(editBtn);
+      actionBar.add(deleteBtn);
+      this.add(actionBar);
+    }
 
     this.__loadData();
   }
@@ -94,8 +98,7 @@ class RoomsPage extends qx.ui.container.Composite {
     form.add(new qx.ui.basic.Label("Capacity"));
     form.add(capInput);
 
-    const dialog = new BsAlertDialog({
-      id: isEdit ? "edit-room-dlg" : "add-room-dlg",
+    BsAlertDialog.show({
       title: isEdit ? "Edit Room" : "Add Room",
       children: form,
       continueLabel: isEdit ? "Save" : "Add",
@@ -115,7 +118,6 @@ class RoomsPage extends qx.ui.container.Composite {
           .catch((err: ApiError) => alert(err.message));
       },
     });
-    dialog.show();
   }
 
   private __editSelected(): void {
@@ -128,8 +130,7 @@ class RoomsPage extends qx.ui.container.Composite {
     const row = this.__getSelectedRow();
     if (!row) return;
 
-    const dialog = new BsAlertDialog({
-      id: "delete-room-dlg",
+    BsAlertDialog.show({
       title: "Delete Room",
       description: `Are you sure you want to delete "${row.name}"?`,
       continueLabel: "Delete",
@@ -140,6 +141,5 @@ class RoomsPage extends qx.ui.container.Composite {
           .catch((err: ApiError) => alert(err.message));
       },
     });
-    dialog.show();
   }
 }

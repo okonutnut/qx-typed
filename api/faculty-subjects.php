@@ -13,6 +13,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'GET':
+        requireAuth();
         $facultyId = (int)($_GET['faculty_id'] ?? 0);
         if (!$facultyId) jsonError('Missing faculty_id');
 

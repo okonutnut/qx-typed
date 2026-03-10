@@ -122,7 +122,7 @@ class Sidebar extends qx.ui.container.Composite {
 
     const footer = new BsSidebarAccount(
       globalThis.username || "User",
-      "Student",
+      formatRoleLabel(globalThis.userRole),
       "resource/app/user.png",
       "RB",
     );

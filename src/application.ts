@@ -2,18 +2,21 @@ function qooxdooMain(app: qx.application.Standalone) {
   const root = <qx.ui.container.Composite>app.getRoot();
   type AppLayoutMode = "login" | "main";
 
-  const pageMap = new Map<string, () => qx.ui.core.Widget>();
-  PAGE_DEFINITIONS.forEach((definition) => {
-    if (definition.factory) {
-      pageMap.set(definition.label, definition.factory);
-    }
-  });
-
-  const sidebarItems = manipulateSidebarItems(createSidebarItems(), pageMap);
-  const initialPage = new MainPage();
-  const initialTitle = "Welcome";
-
   const createMainLayout = () => {
+    // Filter pages by the logged-in user's role
+    const role = globalThis.userRole;
+    const pageMap = new Map<string, () => qx.ui.core.Widget>();
+    PAGE_DEFINITIONS.forEach((definition) => {
+      if (!definition.factory) return;
+      if (definition.allowedRoles && definition.allowedRoles.indexOf(role) === -1)
+        return;
+      pageMap.set(definition.label, definition.factory);
+    });
+
+    const sidebarItems = manipulateSidebarItems(createSidebarItems(), pageMap);
+    const initialPage = new MainPage();
+    const initialTitle = "Welcome";
+
     const mainLayout = new MainLayout(
       initialPage,
       sidebarItems,

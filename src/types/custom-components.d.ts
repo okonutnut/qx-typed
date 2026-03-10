@@ -1,5 +1,9 @@
 interface BsAlertDialog {
-  show(): void;
+  // Singleton — use BsAlertDialog.show(config) static method
+}
+
+interface BsAlertDialogStatic {
+  show(config: BsAlertDialogConfig): void;
 }
 
 interface BsAvatar {
