@@ -2,9 +2,7 @@
  * Subjects management page — CRUD for academic subjects.
  */
 class SubjectsPage extends qx.ui.container.Composite {
-  private __table!: qx.ui.table.Table;
-  private __tableModel!: qx.ui.table.model.Simple;
-  private __rows: SubjectModel[] = [];
+  private __table!: AgGridTable<SubjectModel>;
 
   constructor() {
     super(new qx.ui.layout.VBox(10));
@@ -30,21 +28,21 @@ class SubjectsPage extends qx.ui.container.Composite {
     toolbar.add(refreshBtn);
     this.add(toolbar);
 
-    this.__tableModel = new qx.ui.table.model.Simple();
-    this.__tableModel.setColumns([
-      "ID",
-      "Code",
-      "Name",
-      "Units",
-      "Description",
-    ]);
-
-    this.__table = new qx.ui.table.Table(this.__tableModel);
-    this.__table.set({ height: 400, decorator: null });
-    this.__table.getTableColumnModel().setColumnVisible(0, false);
-    this.__table
-      .getSelectionModel()
-      .setSelectionMode(qx.ui.table.selection.Model.SINGLE_SELECTION);
+    this.__table = new AgGridTable<SubjectModel>(
+      [
+        { headerName: "ID", field: "id", hide: true },
+        { headerName: "Code", field: "code", minWidth: 120, flex: 0 },
+        { headerName: "Name", field: "name", minWidth: 220, flex: 1.3 },
+        { headerName: "Units", field: "units", minWidth: 90, flex: 0 },
+        {
+          headerName: "Description",
+          field: "description",
+          minWidth: 260,
+          flex: 1.8,
+        },
+      ],
+      { emptyMessage: "No subjects available.", rowId: (row) => String(row.id) },
+    );
     this.add(this.__table, { flex: 1 });
 
     if (isAdmin()) {
@@ -75,20 +73,12 @@ class SubjectsPage extends qx.ui.container.Composite {
 
   private __loadData(): void {
     Api.get<SubjectModel[]>("subjects.php").then((data) => {
-      this.__rows = data;
-      this.__tableModel.setData(
-        data.map((s) => [s.id, s.code, s.name, s.units, s.description]),
-      );
+      this.__table.setRows(data);
     });
   }
 
   private __getSelectedRow(): SubjectModel | null {
-    const sel = this.__table.getSelectionModel();
-    const ranges = sel.getSelectedRanges();
-    if (!ranges || ranges.length === 0) return null;
-    const rowIndex = ranges[0].minIndex;
-    const id = this.__tableModel.getValue(0, rowIndex) as number;
-    return this.__rows.find((r) => r.id === id) ?? null;
+    return this.__table.getSelectedRow();
   }
 
   private __showFormDialog(subject?: SubjectModel): void {

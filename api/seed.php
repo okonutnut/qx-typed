@@ -3,119 +3,336 @@
  * SIAS Online — Database seeder.
  *
  * Run: php api/seed.php
- * Creates the schema and inserts sample data.
+ * Rebuilds demo data with a few hundred records for AG Grid testing.
  */
 require_once __DIR__ . '/database.php';
 
 $db = getDb();
 
-// Ensure tables exist
 $schema = file_get_contents(__DIR__ . '/schema.sql');
 $db->exec($schema);
 
-echo "Tables created.\n";
+function resetDatabase(PDO $db): void {
+    $tables = [
+        'schedules',
+        'faculty_subjects',
+        'faculty',
+        'subjects',
+        'rooms',
+        'semesters',
+        'users',
+    ];
 
-// ── Users ────────────────────────────────────────────────────────────
+    $db->beginTransaction();
+    $db->exec('PRAGMA foreign_keys = OFF');
+    foreach ($tables as $table) {
+        $db->exec("DELETE FROM {$table}");
+    }
+    $db->exec("DELETE FROM sqlite_sequence WHERE name IN ('users', 'subjects', 'faculty', 'faculty_subjects', 'rooms', 'semesters', 'schedules')");
+    $db->exec('PRAGMA foreign_keys = ON');
+    $db->commit();
+}
+
+function insertMany(PDO $db, string $sql, array $rows): void {
+    $stmt = $db->prepare($sql);
+    foreach ($rows as $row) {
+        $stmt->execute($row);
+    }
+}
+
+function buildFacultyName(int $index): string {
+    $firstNames = [
+        'Thomas', 'Jane', 'Maria', 'Pedro', 'Anna', 'Mark', 'Liza', 'Paolo',
+        'Angela', 'Ramon', 'Elaine', 'Victor', 'Irene', 'Carlo', 'Bianca',
+        'Dennis', 'Celia', 'Martin', 'Grace', 'Kevin', 'Rhea', 'Noel',
+    ];
+    $lastNames = [
+        'Saddul', 'Doe', 'Santos', 'Reyes', 'Garcia', 'Villanueva', 'Torres',
+        'Cruz', 'Mendoza', 'Navarro', 'Aquino', 'Lim', 'Ramos', 'Soriano',
+        'Bautista', 'Fernandez', 'Domingo', 'Mercado', 'Salazar', 'Flores',
+        'Pascual', 'Castro',
+    ];
+
+    $first = $firstNames[$index % count($firstNames)];
+    $last = $lastNames[intdiv($index, count($firstNames)) % count($lastNames)];
+    return "{$first} {$last}";
+}
+
+function buildSubjectCatalog(): array {
+    $tracks = [
+        ['prefix' => 'CS', 'title' => 'Computer Science', 'topics' => [
+            'Programming', 'Data Structures', 'Algorithms', 'Database Systems',
+            'Operating Systems', 'Networks', 'Web Development', 'Mobile Development',
+            'Software Engineering', 'Information Assurance', 'Human Computer Interaction',
+            'Cloud Computing',
+        ]],
+        ['prefix' => 'IT', 'title' => 'Information Technology', 'topics' => [
+            'Systems Administration', 'Technical Support', 'Enterprise Architecture',
+            'Business Analytics', 'IT Project Management', 'DevOps', 'Virtualization',
+            'Infrastructure Security', 'Service Management', 'Digital Governance',
+            'Platform Engineering', 'Automation',
+        ]],
+        ['prefix' => 'MATH', 'title' => 'Mathematics', 'topics' => [
+            'College Algebra', 'Trigonometry', 'Calculus', 'Linear Algebra',
+            'Discrete Mathematics', 'Statistics', 'Quantitative Methods',
+            'Differential Equations', 'Numerical Analysis', 'Operations Research',
+            'Mathematical Modeling', 'Probability',
+        ]],
+        ['prefix' => 'ENG', 'title' => 'English', 'topics' => [
+            'Communication', 'Technical Writing', 'Speech', 'Academic Reading',
+            'Business Correspondence', 'Creative Writing', 'Professional Presentation',
+            'Research Writing', 'Editing', 'Argumentation', 'World Literature',
+            'Language Studies',
+        ]],
+        ['prefix' => 'BUS', 'title' => 'Business', 'topics' => [
+            'Accounting', 'Economics', 'Entrepreneurship', 'Marketing',
+            'Business Law', 'Operations Management', 'Human Resources',
+            'Finance', 'Strategic Management', 'Supply Chain', 'Innovation',
+            'Organizational Behavior',
+        ]],
+    ];
+
+    $subjects = [];
+    foreach ($tracks as $track) {
+        foreach ([100, 200] as $bandIndex => $levelBand) {
+            foreach ($track['topics'] as $topicIndex => $topic) {
+                $level = $levelBand + ($topicIndex + 1);
+                $code = $track['prefix'] . $level;
+                $subjects[] = [
+                    $code,
+                    "{$track['title']} {$topic} " . ($bandIndex === 0 ? 'I' : 'II'),
+                    ($track['prefix'] === 'ENG' ? 2 : 3),
+                    "Core {$topic} course under the {$track['title']} track.",
+                ];
+            }
+        }
+    }
+
+    return $subjects;
+}
+
+function pickSubjectIds(array $subjectIds, int $facultyIndex): array {
+    $subjectCount = count($subjectIds);
+    $start = ($facultyIndex * 3) % $subjectCount;
+    $count = 4 + ($facultyIndex % 2);
+    $picked = [];
+
+    for ($offset = 0; $offset < $count; $offset++) {
+        $picked[] = $subjectIds[($start + $offset) % $subjectCount];
+    }
+
+    return array_values(array_unique($picked));
+}
+
+function buildScheduleRows(array $facultyAssignments, array $roomIds, int $semesterId): array {
+    $meetingPairs = [
+        ['Mon', 'Wed'],
+        ['Tue', 'Thu'],
+        ['Fri', 'Sat'],
+    ];
+    $timeSlots = [
+        ['07:30', '09:00'],
+        ['09:00', '10:30'],
+        ['10:30', '12:00'],
+        ['13:00', '14:30'],
+        ['14:30', '16:00'],
+        ['16:00', '17:30'],
+    ];
+
+    $facultyBusy = [];
+    $roomBusy = [];
+    $schedules = [];
+    $pairIndex = 0;
+
+    foreach ($facultyAssignments as $facultyId => $subjectIds) {
+        $facultySlotIndex = 0;
+        foreach ($subjectIds as $subjectId) {
+            $meetingPair = $meetingPairs[$pairIndex % count($meetingPairs)];
+            $scheduled = false;
+
+            for ($slotAttempt = 0; $slotAttempt < count($timeSlots) && !$scheduled; $slotAttempt++) {
+                $slot = $timeSlots[($facultySlotIndex + $slotAttempt) % count($timeSlots)];
+                foreach ($roomIds as $roomId) {
+                    $conflict = false;
+                    foreach ($meetingPair as $day) {
+                        $facultyKey = "{$facultyId}|{$day}|{$slot[0]}";
+                        $roomKey = "{$roomId}|{$day}|{$slot[0]}";
+                        if (isset($facultyBusy[$facultyKey]) || isset($roomBusy[$roomKey])) {
+                            $conflict = true;
+                            break;
+                        }
+                    }
+
+                    if ($conflict) {
+                        continue;
+                    }
+
+                    foreach ($meetingPair as $day) {
+                        $facultyBusy["{$facultyId}|{$day}|{$slot[0]}"] = true;
+                        $roomBusy["{$roomId}|{$day}|{$slot[0]}"] = true;
+                        $schedules[] = [
+                            $subjectId,
+                            $facultyId,
+                            $roomId,
+                            $semesterId,
+                            $day,
+                            $slot[0],
+                            $slot[1],
+                        ];
+                    }
+
+                    $scheduled = true;
+                    $facultySlotIndex = ($facultySlotIndex + 1) % count($timeSlots);
+                    $pairIndex++;
+                    break;
+                }
+            }
+        }
+    }
+
+    return $schedules;
+}
+
+resetDatabase($db);
+echo "Database reset.\n";
+
 $users = [
-    ['admin',   password_hash('admin123',   PASSWORD_DEFAULT), 'System Administrator', 'admin'],
-    ['tsaddul', password_hash('faculty123', PASSWORD_DEFAULT), 'Thomas C. Saddul',     'faculty'],
-    ['jdoe',    password_hash('faculty123', PASSWORD_DEFAULT), 'Jane Doe',             'faculty'],
-    ['student1', password_hash('student123', PASSWORD_DEFAULT), 'Juan Dela Cruz',      'student'],
+    ['admin', password_hash('admin123', PASSWORD_DEFAULT), 'System Administrator', 'admin'],
 ];
 
-$stmt = $db->prepare('INSERT OR IGNORE INTO users (username, password_hash, full_name, role) VALUES (?, ?, ?, ?)');
-foreach ($users as $u) $stmt->execute($u);
-echo "Users seeded.\n";
+$facultyCount = 120;
+for ($i = 0; $i < $facultyCount; $i++) {
+    $name = buildFacultyName($i);
+    $users[] = [
+        sprintf('faculty%03d', $i + 1),
+        password_hash('faculty123', PASSWORD_DEFAULT),
+        $name,
+        'faculty',
+    ];
+}
 
-// ── Subjects ─────────────────────────────────────────────────────────
-$subjects = [
-    ['CS101', 'Introduction to Computing',    3, 'Fundamentals of computer science'],
-    ['CS102', 'Data Structures',              3, 'Arrays, lists, trees, graphs'],
-    ['CS103', 'Database Management Systems',  3, 'Relational databases and SQL'],
-    ['CS104', 'Operating Systems',            3, 'Process management, memory, I/O'],
-    ['MATH101', 'College Algebra',            3, 'Algebraic expressions and equations'],
-    ['MATH102', 'Calculus I',                 3, 'Limits, derivatives, integrals'],
-    ['ENG101', 'English Communication',       3, 'Academic reading and writing'],
-    ['PE101',  'Physical Education I',        2, 'Fitness and wellness'],
+for ($i = 0; $i < 40; $i++) {
+    $users[] = [
+        sprintf('student%03d', $i + 1),
+        password_hash('student123', PASSWORD_DEFAULT),
+        'Student ' . str_pad((string)($i + 1), 3, '0', STR_PAD_LEFT),
+        'student',
+    ];
+}
+
+insertMany(
+    $db,
+    'INSERT INTO users (username, password_hash, full_name, role) VALUES (?, ?, ?, ?)',
+    $users
+);
+echo 'Users seeded: ' . count($users) . "\n";
+
+$subjects = buildSubjectCatalog();
+insertMany(
+    $db,
+    'INSERT INTO subjects (code, name, units, description) VALUES (?, ?, ?, ?)',
+    $subjects
+);
+$subjectIds = $db->query('SELECT id FROM subjects ORDER BY id')->fetchAll(PDO::FETCH_COLUMN);
+echo 'Subjects seeded: ' . count($subjects) . "\n";
+
+$departments = [
+    ['Computer Science', 'Software Engineering'],
+    ['Computer Science', 'Data Systems'],
+    ['Information Technology', 'Infrastructure'],
+    ['Information Technology', 'Cybersecurity'],
+    ['Mathematics', 'Applied Mathematics'],
+    ['Languages', 'Communication'],
+    ['Business', 'Operations Management'],
+    ['Business', 'Analytics'],
 ];
 
-$stmt = $db->prepare('INSERT OR IGNORE INTO subjects (code, name, units, description) VALUES (?, ?, ?, ?)');
-foreach ($subjects as $s) $stmt->execute($s);
-echo "Subjects seeded.\n";
+$facultyRows = [];
+$userRows = $db->query("SELECT id, full_name FROM users WHERE role = 'faculty' ORDER BY id")->fetchAll();
+foreach ($userRows as $index => $user) {
+    $dept = $departments[$index % count($departments)];
+    $facultyRows[] = [
+        $user['id'],
+        sprintf('EMP-%03d', $index + 1),
+        $user['full_name'],
+        $dept[0],
+        $dept[1],
+    ];
+}
 
-// ── Faculty ──────────────────────────────────────────────────────────
-$faculty = [
-    [2, 'EMP-001', 'Thomas C. Saddul',  'Computer Science', 'Software Engineering'],
-    [3, 'EMP-002', 'Jane Doe',          'Computer Science', 'Database Systems'],
-    [null, 'EMP-003', 'Maria Santos',   'Mathematics',      'Applied Mathematics'],
-    [null, 'EMP-004', 'Pedro Reyes',    'Languages',        'English Literature'],
-];
+insertMany(
+    $db,
+    'INSERT INTO faculty (user_id, employee_id, full_name, department, specialization) VALUES (?, ?, ?, ?, ?)',
+    $facultyRows
+);
+$facultyIds = $db->query('SELECT id FROM faculty ORDER BY id')->fetchAll(PDO::FETCH_COLUMN);
+echo 'Faculty seeded: ' . count($facultyRows) . "\n";
 
-$stmt = $db->prepare('INSERT OR IGNORE INTO faculty (user_id, employee_id, full_name, department, specialization) VALUES (?, ?, ?, ?, ?)');
-foreach ($faculty as $f) $stmt->execute($f);
-echo "Faculty seeded.\n";
+$assignmentRows = [];
+$facultyAssignments = [];
+foreach ($facultyIds as $index => $facultyId) {
+    $assignedSubjectIds = pickSubjectIds($subjectIds, $index);
+    $facultyAssignments[$facultyId] = $assignedSubjectIds;
+    foreach ($assignedSubjectIds as $subjectId) {
+        $assignmentRows[] = [$facultyId, $subjectId];
+    }
+}
 
-// ── Faculty-Subject assignments ──────────────────────────────────────
-$assignments = [
-    [1, 1], // Saddul → CS101
-    [1, 2], // Saddul → CS102
-    [2, 3], // Doe → CS103
-    [2, 4], // Doe → CS104
-    [3, 5], // Santos → MATH101
-    [3, 6], // Santos → MATH102
-    [4, 7], // Reyes → ENG101
-];
+insertMany(
+    $db,
+    'INSERT INTO faculty_subjects (faculty_id, subject_id) VALUES (?, ?)',
+    $assignmentRows
+);
+echo 'Faculty-subject assignments seeded: ' . count($assignmentRows) . "\n";
 
-$stmt = $db->prepare('INSERT OR IGNORE INTO faculty_subjects (faculty_id, subject_id) VALUES (?, ?)');
-foreach ($assignments as $a) $stmt->execute($a);
-echo "Faculty-subject assignments seeded.\n";
+$rooms = [];
+$buildings = ['Main Building', 'IT Building', 'Science Wing', 'Business Center'];
+for ($i = 1; $i <= 24; $i++) {
+    $rooms[] = [
+        'Room ' . str_pad((string)$i, 3, '0', STR_PAD_LEFT),
+        $buildings[($i - 1) % count($buildings)],
+        30 + (($i * 5) % 35),
+    ];
+}
+for ($i = 1; $i <= 6; $i++) {
+    $rooms[] = [
+        'CompLab ' . $i,
+        'IT Building',
+        36 + ($i * 2),
+    ];
+}
 
-// ── Rooms ────────────────────────────────────────────────────────────
-$rooms = [
-    ['Room 101', 'Main Building', 40],
-    ['Room 102', 'Main Building', 35],
-    ['Room 201', 'Main Building', 40],
-    ['CompLab 1', 'IT Building',  30],
-    ['CompLab 2', 'IT Building',  30],
-    ['Gym',       'Annex',        100],
-];
+insertMany(
+    $db,
+    'INSERT INTO rooms (name, building, capacity) VALUES (?, ?, ?)',
+    $rooms
+);
+$roomIds = $db->query('SELECT id FROM rooms ORDER BY id')->fetchAll(PDO::FETCH_COLUMN);
+echo 'Rooms seeded: ' . count($rooms) . "\n";
 
-$stmt = $db->prepare('INSERT OR IGNORE INTO rooms (name, building, capacity) VALUES (?, ?, ?)');
-foreach ($rooms as $r) $stmt->execute($r);
-echo "Rooms seeded.\n";
-
-// ── Semesters ────────────────────────────────────────────────────────
 $semesters = [
     ['1st Semester', '2025-2026', 1],
     ['2nd Semester', '2025-2026', 0],
-    ['Summer',       '2025-2026', 0],
+    ['Summer', '2025-2026', 0],
+    ['1st Semester', '2026-2027', 0],
+    ['2nd Semester', '2026-2027', 0],
+    ['Summer', '2026-2027', 0],
 ];
 
-$stmt = $db->prepare('INSERT OR IGNORE INTO semesters (name, school_year, is_active) VALUES (?, ?, ?)');
-foreach ($semesters as $s) $stmt->execute($s);
-echo "Semesters seeded.\n";
+insertMany(
+    $db,
+    'INSERT INTO semesters (name, school_year, is_active) VALUES (?, ?, ?)',
+    $semesters
+);
+$activeSemesterId = (int)$db->query('SELECT id FROM semesters WHERE is_active = 1 LIMIT 1')->fetchColumn();
+echo 'Semesters seeded: ' . count($semesters) . "\n";
 
-// ── Schedules (for active semester) ──────────────────────────────────
-$activeSem = $db->query('SELECT id FROM semesters WHERE is_active = 1 LIMIT 1')->fetch();
-if ($activeSem) {
-    $semId = $activeSem['id'];
-    $schedules = [
-        // subject_id, faculty_id, room_id, semester_id, day, start, end
-        [1, 1, 4, $semId, 'Mon', '07:30', '09:00'], // CS101, Saddul, CompLab 1
-        [1, 1, 4, $semId, 'Wed', '07:30', '09:00'],
-        [2, 1, 4, $semId, 'Tue', '09:00', '10:30'], // CS102, Saddul, CompLab 1
-        [2, 1, 4, $semId, 'Thu', '09:00', '10:30'],
-        [3, 2, 5, $semId, 'Mon', '09:00', '10:30'], // CS103, Doe, CompLab 2
-        [3, 2, 5, $semId, 'Wed', '09:00', '10:30'],
-        [5, 3, 1, $semId, 'Mon', '10:30', '12:00'], // MATH101, Santos, Room 101
-        [5, 3, 1, $semId, 'Fri', '10:30', '12:00'],
-        [7, 4, 2, $semId, 'Tue', '07:30', '09:00'], // ENG101, Reyes, Room 102
-        [7, 4, 2, $semId, 'Thu', '07:30', '09:00'],
-    ];
-
-    $stmt = $db->prepare('INSERT OR IGNORE INTO schedules (subject_id, faculty_id, room_id, semester_id, day_of_week, start_time, end_time) VALUES (?, ?, ?, ?, ?, ?, ?)');
-    foreach ($schedules as $sc) $stmt->execute($sc);
-    echo "Schedules seeded.\n";
-}
+$scheduleRows = buildScheduleRows($facultyAssignments, $roomIds, $activeSemesterId);
+insertMany(
+    $db,
+    'INSERT INTO schedules (subject_id, faculty_id, room_id, semester_id, day_of_week, start_time, end_time) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    $scheduleRows
+);
+echo 'Schedules seeded: ' . count($scheduleRows) . "\n";
 
 echo "\nDone! Database ready at api/sias.db\n";

@@ -186,3 +186,59 @@
     letter-spacing: var(--tracking-normal);
   }
 }
+
+.app-ag-grid-shell {
+  height: 100%;
+  min-height: 420px;
+  padding: 4px;
+}
+
+.app-ag-grid-theme {
+  height: 100%;
+  min-height: 420px;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  --ag-background-color: var(--card);
+  --ag-foreground-color: var(--foreground);
+  --ag-border-color: var(--border);
+  --ag-header-background-color: color-mix(in oklab, var(--muted) 88%, white);
+  --ag-header-foreground-color: var(--foreground);
+  --ag-row-hover-color: color-mix(in oklab, var(--accent) 35%, white);
+  --ag-selected-row-background-color: color-mix(
+    in oklab,
+    var(--secondary) 20%,
+    white
+  );
+  --ag-odd-row-background-color: color-mix(in oklab, var(--muted) 42%, white);
+  --ag-font-family: var(--font-sans);
+  --ag-font-size: 13px;
+  --ag-grid-size: 6px;
+  --ag-row-border-color: color-mix(in oklab, var(--border) 80%, white);
+}
+
+.dark .app-ag-grid-theme {
+  --ag-header-background-color: color-mix(in oklab, var(--muted) 78%, black);
+  --ag-row-hover-color: color-mix(in oklab, var(--accent) 18%, black);
+  --ag-selected-row-background-color: color-mix(
+    in oklab,
+    var(--secondary) 24%,
+    black
+  );
+  --ag-odd-row-background-color: color-mix(in oklab, var(--muted) 60%, black);
+  --ag-row-border-color: color-mix(in oklab, var(--border) 75%, black);
+}
+
+.app-ag-grid-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 420px;
+  padding: 24px;
+  border: 1px dashed var(--destructive);
+  border-radius: calc(var(--radius) + 2px);
+  color: var(--destructive);
+  background: color-mix(in oklab, var(--destructive) 8%, white);
+  text-align: center;
+}

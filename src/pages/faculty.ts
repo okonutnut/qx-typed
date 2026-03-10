@@ -2,9 +2,7 @@
  * Faculty management page — CRUD for faculty members + subject assignments.
  */
 class FacultyPage extends qx.ui.container.Composite {
-  private __table!: qx.ui.table.Table;
-  private __tableModel!: qx.ui.table.model.Simple;
-  private __rows: FacultyModel[] = [];
+  private __table!: AgGridTable<FacultyModel>;
 
   constructor() {
     super(new qx.ui.layout.VBox(10));
@@ -31,21 +29,29 @@ class FacultyPage extends qx.ui.container.Composite {
     toolbar.add(refreshBtn);
     this.add(toolbar);
 
-    this.__tableModel = new qx.ui.table.model.Simple();
-    this.__tableModel.setColumns([
-      "ID",
-      "Employee ID",
-      "Full Name",
-      "Department",
-      "Specialization",
-    ]);
-
-    this.__table = new qx.ui.table.Table(this.__tableModel);
-    this.__table.set({ height: 400, decorator: null });
-    this.__table.getTableColumnModel().setColumnVisible(0, false);
-    this.__table
-      .getSelectionModel()
-      .setSelectionMode(qx.ui.table.selection.Model.SINGLE_SELECTION);
+    this.__table = new AgGridTable<FacultyModel>(
+      [
+        { headerName: "ID", field: "id", hide: true },
+        {
+          headerName: "Employee ID",
+          field: "employee_id",
+          minWidth: 140,
+          flex: 0,
+        },
+        { headerName: "Full Name", field: "full_name", minWidth: 220, flex: 1.2 },
+        { headerName: "Department", field: "department", minWidth: 180, flex: 1 },
+        {
+          headerName: "Specialization",
+          field: "specialization",
+          minWidth: 220,
+          flex: 1.2,
+        },
+      ],
+      {
+        emptyMessage: "No faculty records found.",
+        rowId: (row) => String(row.id),
+      },
+    );
     this.add(this.__table, { flex: 1 });
 
     if (isAdmin()) {
@@ -77,26 +83,12 @@ class FacultyPage extends qx.ui.container.Composite {
 
   private __loadData(): void {
     Api.get<FacultyModel[]>("faculty.php").then((data) => {
-      this.__rows = data;
-      this.__tableModel.setData(
-        data.map((f) => [
-          f.id,
-          f.employee_id,
-          f.full_name,
-          f.department,
-          f.specialization,
-        ]),
-      );
+      this.__table.setRows(data);
     });
   }
 
   private __getSelectedRow(): FacultyModel | null {
-    const sel = this.__table.getSelectionModel();
-    const ranges = sel.getSelectedRanges();
-    if (!ranges || ranges.length === 0) return null;
-    const rowIndex = ranges[0].minIndex;
-    const id = this.__tableModel.getValue(0, rowIndex) as number;
-    return this.__rows.find((r) => r.id === id) ?? null;
+    return this.__table.getSelectedRow();
   }
 
   private __showFormDialog(faculty?: FacultyModel): void {
@@ -193,7 +185,6 @@ class FacultyPage extends qx.ui.container.Composite {
       info.setTextColor(AppColors.mutedForeground());
       container.add(info);
 
-      // Current assignments list
       const currentLabel = new qx.ui.basic.Label("Current Assignments:");
       currentLabel.setFont(
         // @ts-ignore
@@ -240,7 +231,6 @@ class FacultyPage extends qx.ui.container.Composite {
       renderAssignments(assigned);
       container.add(assignmentList);
 
-      // Add new assignment
       const unassigned = allSubjects.filter((s) => !assignedIds.has(s.id));
       if (unassigned.length > 0) {
         const addLabel = new qx.ui.basic.Label("Add Subject:");

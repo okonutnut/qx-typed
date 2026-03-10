@@ -2,9 +2,7 @@
  * Schedules management page — CRUD with conflict detection.
  */
 class SchedulesPage extends qx.ui.container.Composite {
-  private __table!: qx.ui.table.Table;
-  private __tableModel!: qx.ui.table.model.Simple;
-  private __rows: ScheduleModel[] = [];
+  private __table!: AgGridTable<ScheduleModel>;
   private __semesters: SemesterModel[] = [];
   private __faculty: FacultyModel[] = [];
   private __subjects: SubjectModel[] = [];
@@ -15,7 +13,6 @@ class SchedulesPage extends qx.ui.container.Composite {
   constructor() {
     super(new qx.ui.layout.VBox(10));
 
-    // Toolbar: semester filter + actions
     const toolbar = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
 
     const semLabel = new qx.ui.basic.Label("Semester:");
@@ -50,27 +47,33 @@ class SchedulesPage extends qx.ui.container.Composite {
     toolbar.add(refreshBtn);
     this.add(toolbar);
 
-    // Table
-    this.__tableModel = new qx.ui.table.model.Simple();
-    this.__tableModel.setColumns([
-      "ID",
-      "Subject",
-      "Faculty",
-      "Room",
-      "Day",
-      "Start",
-      "End",
-    ]);
-
-    this.__table = new qx.ui.table.Table(this.__tableModel);
-    this.__table.set({ height: 400, decorator: null });
-    this.__table.getTableColumnModel().setColumnVisible(0, false);
-    this.__table
-      .getSelectionModel()
-      .setSelectionMode(qx.ui.table.selection.Model.SINGLE_SELECTION);
+    this.__table = new AgGridTable<ScheduleModel>(
+      [
+        { headerName: "ID", field: "id", hide: true },
+        {
+          headerName: "Subject",
+          minWidth: 230,
+          flex: 1.3,
+          valueGetter: (row) => `${row.subject_code} — ${row.subject_name}`,
+        },
+        { headerName: "Faculty", field: "faculty_name", minWidth: 210, flex: 1.2 },
+        {
+          headerName: "Room",
+          minWidth: 170,
+          flex: 1,
+          valueGetter: (row) => `${row.room_name} (${row.building})`,
+        },
+        { headerName: "Day", field: "day_of_week", minWidth: 90, flex: 0 },
+        { headerName: "Start", field: "start_time", minWidth: 95, flex: 0 },
+        { headerName: "End", field: "end_time", minWidth: 95, flex: 0 },
+      ],
+      {
+        emptyMessage: "No schedules found for the selected semester.",
+        rowId: (row) => String(row.id),
+      },
+    );
     this.add(this.__table, { flex: 1 });
 
-    // Action bar (admin only)
     if (isAdmin()) {
       const actionBar = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
       const editBtn = new BsButton("Edit", undefined, "btn-sm", "outline");
@@ -105,7 +108,6 @@ class SchedulesPage extends qx.ui.container.Composite {
       const active = semesters.find((s) => s.is_active);
       this.__activeSemesterId = active ? active.id : null;
 
-      // Rebuild semester select options
       const labels = semesters.map((s) => `${s.name} — ${s.school_year}`);
       this.__semesterSelect = this.__rebuildSelect(
         this.__semesterSelect,
@@ -148,28 +150,12 @@ class SchedulesPage extends qx.ui.container.Composite {
     const url = semId ? `schedules.php?semester_id=${semId}` : "schedules.php";
 
     Api.get<ScheduleModel[]>(url).then((data) => {
-      this.__rows = data;
-      this.__tableModel.setData(
-        data.map((s) => [
-          s.id,
-          `${s.subject_code} — ${s.subject_name}`,
-          s.faculty_name,
-          `${s.room_name} (${s.building})`,
-          s.day_of_week,
-          s.start_time,
-          s.end_time,
-        ]),
-      );
+      this.__table.setRows(data);
     });
   }
 
   private __getSelectedRow(): ScheduleModel | null {
-    const sel = this.__table.getSelectionModel();
-    const ranges = sel.getSelectedRanges();
-    if (!ranges || ranges.length === 0) return null;
-    const rowIndex = ranges[0].minIndex;
-    const id = this.__tableModel.getValue(0, rowIndex) as number;
-    return this.__rows.find((r) => r.id === id) ?? null;
+    return this.__table.getSelectedRow();
   }
 
   private __showFormDialog(schedule?: ScheduleModel): void {
@@ -238,7 +224,6 @@ class SchedulesPage extends qx.ui.container.Composite {
       continueLabel: isEdit ? "Save" : "Add",
       footerButtons: "ok-cancel",
       onContinue: () => {
-        // Resolve IDs from select labels
         const subjectLabel = subjectSelect.getSelectedValue();
         const subjectCode = subjectLabel ? subjectLabel.split(" — ")[0] : "";
         const subject = this.__subjects.find((s) => s.code === subjectCode);
@@ -275,7 +260,6 @@ class SchedulesPage extends qx.ui.container.Composite {
         promise
           .then(() => this.__loadSchedules())
           .catch((err: ApiError) => {
-            // Show conflict details if available
             if (err.data && err.data.conflicts) {
               alert(err.data.conflicts.join("\n"));
             } else {

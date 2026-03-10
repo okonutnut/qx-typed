@@ -2,9 +2,7 @@
  * Rooms management page — CRUD for rooms.
  */
 class RoomsPage extends qx.ui.container.Composite {
-  private __table!: qx.ui.table.Table;
-  private __tableModel!: qx.ui.table.model.Simple;
-  private __rows: RoomModel[] = [];
+  private __table!: AgGridTable<RoomModel>;
 
   constructor() {
     super(new qx.ui.layout.VBox(10));
@@ -31,15 +29,15 @@ class RoomsPage extends qx.ui.container.Composite {
     toolbar.add(refreshBtn);
     this.add(toolbar);
 
-    this.__tableModel = new qx.ui.table.model.Simple();
-    this.__tableModel.setColumns(["ID", "Name", "Building", "Capacity"]);
-
-    this.__table = new qx.ui.table.Table(this.__tableModel);
-    this.__table.set({ height: 400, decorator: null });
-    this.__table.getTableColumnModel().setColumnVisible(0, false);
-    this.__table
-      .getSelectionModel()
-      .setSelectionMode(qx.ui.table.selection.Model.SINGLE_SELECTION);
+    this.__table = new AgGridTable<RoomModel>(
+      [
+        { headerName: "ID", field: "id", hide: true },
+        { headerName: "Name", field: "name", minWidth: 140, flex: 1 },
+        { headerName: "Building", field: "building", minWidth: 160, flex: 1 },
+        { headerName: "Capacity", field: "capacity", minWidth: 110, flex: 0 },
+      ],
+      { emptyMessage: "No rooms available.", rowId: (row) => String(row.id) },
+    );
     this.add(this.__table, { flex: 1 });
 
     if (isAdmin()) {
@@ -63,20 +61,12 @@ class RoomsPage extends qx.ui.container.Composite {
 
   private __loadData(): void {
     Api.get<RoomModel[]>("rooms.php").then((data) => {
-      this.__rows = data;
-      this.__tableModel.setData(
-        data.map((r) => [r.id, r.name, r.building, r.capacity]),
-      );
+      this.__table.setRows(data);
     });
   }
 
   private __getSelectedRow(): RoomModel | null {
-    const sel = this.__table.getSelectionModel();
-    const ranges = sel.getSelectedRanges();
-    if (!ranges || ranges.length === 0) return null;
-    const rowIndex = ranges[0].minIndex;
-    const id = this.__tableModel.getValue(0, rowIndex) as number;
-    return this.__rows.find((r) => r.id === id) ?? null;
+    return this.__table.getSelectedRow();
   }
 
   private __showFormDialog(room?: RoomModel): void {

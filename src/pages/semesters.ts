@@ -2,9 +2,7 @@
  * Semesters management page — CRUD + set active semester.
  */
 class SemestersPage extends qx.ui.container.Composite {
-  private __table!: qx.ui.table.Table;
-  private __tableModel!: qx.ui.table.model.Simple;
-  private __rows: SemesterModel[] = [];
+  private __table!: AgGridTable<SemesterModel>;
 
   constructor() {
     super(new qx.ui.layout.VBox(10));
@@ -31,18 +29,29 @@ class SemestersPage extends qx.ui.container.Composite {
     toolbar.add(refreshBtn);
     this.add(toolbar);
 
-    this.__tableModel = new qx.ui.table.model.Simple();
-    this.__tableModel.setColumns(["ID", "Name", "School Year", "Active"]);
-
-    this.__table = new qx.ui.table.Table(this.__tableModel);
-    this.__table.set({ height: 400, decorator: null });
-    this.__table.getTableColumnModel().setColumnVisible(0, false);
-    this.__table
-      .getTableColumnModel()
-      .setDataCellRenderer(3, new qx.ui.table.cellrenderer.Boolean());
-    this.__table
-      .getSelectionModel()
-      .setSelectionMode(qx.ui.table.selection.Model.SINGLE_SELECTION);
+    this.__table = new AgGridTable<SemesterModel>(
+      [
+        { headerName: "ID", field: "id", hide: true },
+        { headerName: "Name", field: "name", minWidth: 180, flex: 1 },
+        {
+          headerName: "School Year",
+          field: "school_year",
+          minWidth: 160,
+          flex: 1,
+        },
+        {
+          headerName: "Status",
+          field: "is_active",
+          minWidth: 120,
+          flex: 0,
+          valueFormatter: (value) => (value ? "Active" : "Inactive"),
+        },
+      ],
+      {
+        emptyMessage: "No semesters configured.",
+        rowId: (row) => String(row.id),
+      },
+    );
     this.add(this.__table, { flex: 1 });
 
     if (isAdmin()) {
@@ -74,20 +83,12 @@ class SemestersPage extends qx.ui.container.Composite {
 
   private __loadData(): void {
     Api.get<SemesterModel[]>("semesters.php").then((data) => {
-      this.__rows = data;
-      this.__tableModel.setData(
-        data.map((s) => [s.id, s.name, s.school_year, !!s.is_active]),
-      );
+      this.__table.setRows(data);
     });
   }
 
   private __getSelectedRow(): SemesterModel | null {
-    const sel = this.__table.getSelectionModel();
-    const ranges = sel.getSelectedRanges();
-    if (!ranges || ranges.length === 0) return null;
-    const rowIndex = ranges[0].minIndex;
-    const id = this.__tableModel.getValue(0, rowIndex) as number;
-    return this.__rows.find((r) => r.id === id) ?? null;
+    return this.__table.getSelectedRow();
   }
 
   private __showFormDialog(semester?: SemesterModel): void {

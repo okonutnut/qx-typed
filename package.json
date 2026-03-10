@@ -5,6 +5,7 @@
   "repository": {},
   "dependencies": {
     "@tailwindcss/cli": "^4.2.1",
+    "ag-grid-community": "^35.1.0",
     "basecoat-css": "^0.3.11",
     "http-server": "^14.1.1",
     "lucide-static": "^0.575.0",
