@@ -79,17 +79,14 @@ class LoginLayout extends qx.ui.container.Composite {
       loginError.exclude();
       submit.setEnabled(false);
 
-      Api.post<{ user: UserModel }>("auth.php", {
-        username: user,
-        password: pass,
-      })
-        .then((result) => {
-          globalThis.username = result.user.username;
-          globalThis.userRole = result.user.role;
-          globalThis.userFullName = result.user.full_name;
+      Api.Queries.user(1).then((result) => {
+          globalThis.username = result.user!.username;
+          globalThis.userRole = result.user!.role;
+          globalThis.userFullName = result.user!.fullName;
           this.fireEvent("login");
         })
         .catch((err: ApiError) => {
+          console.error("[Login] Error:", err);
           loginError.setValue(err.message || "Login failed");
           loginError.show();
           submit.setEnabled(true);

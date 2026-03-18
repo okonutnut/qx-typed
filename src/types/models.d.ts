@@ -1,7 +1,7 @@
 interface UserModel {
   id: number;
   username: string;
-  full_name: string;
+  fullName: string;
   role: "admin" | "faculty" | "student";
 }
 
@@ -15,17 +15,17 @@ interface SubjectModel {
 
 interface FacultyModel {
   id: number;
-  user_id: number | null;
-  employee_id: string;
-  full_name: string;
+  userId: number | null;
+  employeeId: string;
+  fullName: string;
   department: string;
   specialization: string;
 }
 
 interface FacultySubjectModel {
   id: number;
-  faculty_id: number;
-  subject_id: number;
+  facultyId: number;
+  subjectId: number;
   code: string;
   name: string;
   units: number;
@@ -41,25 +41,25 @@ interface RoomModel {
 interface SemesterModel {
   id: number;
   name: string;
-  school_year: string;
-  is_active: number;
+  schoolYear: string;
+  isActive: number;
 }
 
 interface ScheduleModel {
   id: number;
-  subject_id: number;
-  faculty_id: number;
-  room_id: number;
-  semester_id: number;
-  day_of_week: string;
-  start_time: string;
-  end_time: string;
-  subject_code: string;
-  subject_name: string;
-  faculty_name: string;
-  employee_id: string;
-  room_name: string;
+  subjectId: number;
+  facultyId: number;
+  roomId: number;
+  semesterId: number;
+  dayOfWeek: string;
+  startTime: string;
+  endTime: string;
+  subjectCode: string;
+  subjectName: string;
+  facultyName: string;
+  employeeId: string;
+  roomName: string;
   building: string;
-  semester_name: string;
-  school_year: string;
+  semesterName: string;
+  schoolYear: string;
 }

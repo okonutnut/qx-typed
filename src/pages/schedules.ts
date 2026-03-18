@@ -54,18 +54,18 @@ class SchedulesPage extends qx.ui.container.Composite {
           headerName: "Subject",
           minWidth: 230,
           flex: 1.3,
-          valueGetter: (row) => `${row.subject_code} — ${row.subject_name}`,
+          valueGetter: (row) => `${row.subjectCode} — ${row.subjectName}`,
         },
-        { headerName: "Faculty", field: "faculty_name", minWidth: 210, flex: 1.2 },
+        { headerName: "Faculty", field: "facultyName", minWidth: 210, flex: 1.2 },
         {
           headerName: "Room",
           minWidth: 170,
           flex: 1,
-          valueGetter: (row) => `${row.room_name} (${row.building})`,
+          valueGetter: (row) => `${row.roomName} (${row.building})`,
         },
-        { headerName: "Day", field: "day_of_week", minWidth: 90, flex: 0 },
-        { headerName: "Start", field: "start_time", minWidth: 95, flex: 0 },
-        { headerName: "End", field: "end_time", minWidth: 95, flex: 0 },
+        { headerName: "Day", field: "dayOfWeek", minWidth: 90, flex: 0 },
+        { headerName: "Start", field: "startTime", minWidth: 95, flex: 0 },
+        { headerName: "End", field: "endTime", minWidth: 95, flex: 0 },
       ],
       {
         emptyMessage: "No schedules found for the selected semester.",
@@ -95,27 +95,27 @@ class SchedulesPage extends qx.ui.container.Composite {
 
   private __loadAll(): void {
     Promise.all([
-      Api.get<SemesterModel[]>("semesters.php"),
-      Api.get<FacultyModel[]>("faculty.php"),
-      Api.get<SubjectModel[]>("subjects.php"),
-      Api.get<RoomModel[]>("rooms.php"),
-    ]).then(([semesters, faculty, subjects, rooms]) => {
-      this.__semesters = semesters;
-      this.__faculty = faculty;
-      this.__subjects = subjects;
-      this.__rooms = rooms;
+      Api.Queries.semesters(),
+      Api.Queries.faculties(),
+      Api.Queries.subjects(),
+      Api.Queries.rooms(),
+    ]).then(([semestersResult, facultyResult, subjectsResult, roomsResult]) => {
+      this.__semesters = semestersResult.semesters;
+      this.__faculty = facultyResult.faculties;
+      this.__subjects = subjectsResult.subjects;
+      this.__rooms = roomsResult.rooms;
 
-      const active = semesters.find((s) => s.is_active);
+      const active = this.__semesters.find((s) => s.isActive);
       this.__activeSemesterId = active ? active.id : null;
 
-      const labels = semesters.map((s) => `${s.name} — ${s.school_year}`);
+      const labels = this.__semesters.map((s) => `${s.name} — ${s.schoolYear}`);
       this.__semesterSelect = this.__rebuildSelect(
         this.__semesterSelect,
         labels,
       );
       if (active) {
         this.__semesterSelect.setSelectedByLabel(
-          `${active.name} — ${active.school_year}`,
+          `${active.name} — ${active.schoolYear}`,
         );
       }
 
@@ -140,17 +140,19 @@ class SchedulesPage extends qx.ui.container.Composite {
     const label = this.__semesterSelect.getSelectedValue();
     if (!label) return this.__activeSemesterId;
     const match = this.__semesters.find(
-      (s) => `${s.name} — ${s.school_year}` === label,
+      (s) => `${s.name} — ${s.schoolYear}` === label,
     );
     return match ? match.id : this.__activeSemesterId;
   }
 
   private __loadSchedules(): void {
     const semId = this.__getSelectedSemesterId();
-    const url = semId ? `schedules.php?semester_id=${semId}` : "schedules.php";
 
-    Api.get<ScheduleModel[]>(url).then((data) => {
-      this.__table.setRows(data);
+    Api.Queries.schedules().then((result) => {
+      const schedules = semId 
+        ? result.schedules.filter(s => s.semesterId === semId)
+        : result.schedules;
+      this.__table.setRows(schedules);
     });
   }
 
@@ -169,17 +171,17 @@ class SchedulesPage extends qx.ui.container.Composite {
     subjectSelect.setAllowGrowX(true);
     if (schedule) {
       subjectSelect.setSelectedByLabel(
-        `${schedule.subject_code} — ${schedule.subject_name}`,
+        `${schedule.subjectCode} — ${schedule.subjectName}`,
       );
     }
 
     const facultySelect = new BsSelect(
-      this.__faculty.map((f) => `${f.employee_id} — ${f.full_name}`),
+      this.__faculty.map((f) => `${f.employeeId} — ${f.fullName}`),
     );
     facultySelect.setAllowGrowX(true);
     if (schedule) {
       facultySelect.setSelectedByLabel(
-        `${schedule.employee_id} — ${schedule.faculty_name}`,
+        `${schedule.employeeId} — ${schedule.facultyName}`,
       );
     }
 
@@ -189,20 +191,20 @@ class SchedulesPage extends qx.ui.container.Composite {
     roomSelect.setAllowGrowX(true);
     if (schedule) {
       roomSelect.setSelectedByLabel(
-        `${schedule.room_name} (${schedule.building})`,
+        `${schedule.roomName} (${schedule.building})`,
       );
     }
 
     const daySelect = new BsSelect(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]);
     daySelect.setAllowGrowX(true);
-    if (schedule) daySelect.setSelectedByLabel(schedule.day_of_week);
+    if (schedule) daySelect.setSelectedByLabel(schedule.dayOfWeek);
 
     const startInput = new BsInput(
-      schedule?.start_time ?? "",
+      schedule?.startTime ?? "",
       "Start Time (HH:MM)",
     );
     startInput.setAllowGrowX(true);
-    const endInput = new BsInput(schedule?.end_time ?? "", "End Time (HH:MM)");
+    const endInput = new BsInput(schedule?.endTime ?? "", "End Time (HH:MM)");
     endInput.setAllowGrowX(true);
 
     form.add(new qx.ui.basic.Label("Subject"));
@@ -230,7 +232,7 @@ class SchedulesPage extends qx.ui.container.Composite {
 
         const facultyLabel = facultySelect.getSelectedValue();
         const empId = facultyLabel ? facultyLabel.split(" — ")[0] : "";
-        const faculty = this.__faculty.find((f) => f.employee_id === empId);
+        const faculty = this.__faculty.find((f) => f.employeeId === empId);
 
         const roomLabel = roomSelect.getSelectedValue();
         const roomName = roomLabel ? roomLabel.split(" (")[0] : "";
@@ -243,29 +245,17 @@ class SchedulesPage extends qx.ui.container.Composite {
           return;
         }
 
-        const body = {
-          subject_id: subject.id,
-          faculty_id: faculty.id,
-          room_id: room.id,
-          semester_id: semId,
-          day_of_week: daySelect.getSelectedValue(),
-          start_time: startInput.getValue().trim(),
-          end_time: endInput.getValue().trim(),
-        };
+        const dayOfWeek = daySelect.getSelectedValue();
+        const startTime = startInput.getValue().trim();
+        const endTime = endInput.getValue().trim();
 
         const promise = isEdit
-          ? Api.put(`schedules.php?id=${schedule!.id}`, body)
-          : Api.post("schedules.php", body);
+          ? Api.Mutations.updateSchedule(schedule!.id, subject.id, faculty.id, room.id, semId, dayOfWeek, startTime, endTime)
+          : Api.Mutations.createSchedule(subject.id, faculty.id, room.id, semId, dayOfWeek, startTime, endTime);
 
         promise
           .then(() => this.__loadSchedules())
-          .catch((err: ApiError) => {
-            if (err.data && err.data.conflicts) {
-              alert(err.data.conflicts.join("\n"));
-            } else {
-              alert(err.message);
-            }
-          });
+          .catch((err: Error) => alert(err.message));
       },
     });
   }
@@ -282,13 +272,13 @@ class SchedulesPage extends qx.ui.container.Composite {
 
     BsAlertDialog.show({
       title: "Delete Schedule",
-      description: `Delete ${row.subject_code} — ${row.faculty_name} on ${row.day_of_week} ${row.start_time}-${row.end_time}?`,
+      description: `Delete ${row.subjectCode} — ${row.facultyName} on ${row.dayOfWeek} ${row.startTime}-${row.endTime}?`,
       continueLabel: "Delete",
       footerButtons: "ok-cancel",
       onContinue: () => {
-        Api.del(`schedules.php?id=${row.id}`)
+        Api.Mutations.deleteSchedule(row.id)
           .then(() => this.__loadSchedules())
-          .catch((err: ApiError) => alert(err.message));
+          .catch((err: Error) => alert(err.message));
       },
     });
   }

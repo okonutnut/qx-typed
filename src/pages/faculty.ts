@@ -10,7 +10,7 @@ class FacultyPage extends qx.ui.container.Composite {
     const toolbar = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
     if (isAdmin()) {
       const addBtn = new BsButton(
-        "Add Faculty",
+        "Add New",
         new InlineSvgIcon("plus", 16),
         "btn-sm",
         "primary",
@@ -22,8 +22,7 @@ class FacultyPage extends qx.ui.container.Composite {
     const refreshBtn = new BsButton(
       "Refresh",
       new InlineSvgIcon("refresh-cw", 16),
-      "btn-sm",
-      "outline",
+      "btn-sm-outline",
     );
     refreshBtn.onClick(() => this.__loadData());
     toolbar.add(refreshBtn);
@@ -34,11 +33,11 @@ class FacultyPage extends qx.ui.container.Composite {
         { headerName: "ID", field: "id", hide: true },
         {
           headerName: "Employee ID",
-          field: "employee_id",
+          field: "employeeId",
           minWidth: 140,
           flex: 0,
         },
-        { headerName: "Full Name", field: "full_name", minWidth: 220, flex: 1.2 },
+        { headerName: "Full Name", field: "fullName", minWidth: 220, flex: 1.2 },
         { headerName: "Department", field: "department", minWidth: 180, flex: 1 },
         {
           headerName: "Specialization",
@@ -56,19 +55,19 @@ class FacultyPage extends qx.ui.container.Composite {
 
     if (isAdmin()) {
       const actionBar = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
-      const editBtn = new BsButton("Edit", undefined, "btn-sm", "outline");
+      const editBtn = new BsButton("Edit", undefined, "btn-sm-outline");
       editBtn.onClick(() => this.__editSelected());
       const deleteBtn = new BsButton(
         "Delete",
         undefined,
-        "btn-sm",
+        "btn-sm-destructive",
         "destructive",
       );
       deleteBtn.onClick(() => this.__deleteSelected());
       const assignBtn = new BsButton(
-        "Assign Subjects",
+        "Assign",
         undefined,
-        "btn-sm",
+        "btn-sm-secondary",
         "secondary",
       );
       assignBtn.onClick(() => this.__assignSubjects());
@@ -82,8 +81,8 @@ class FacultyPage extends qx.ui.container.Composite {
   }
 
   private __loadData(): void {
-    Api.get<FacultyModel[]>("faculty.php").then((data) => {
-      this.__table.setRows(data);
+    Api.Queries.faculties().then((result) => {
+      this.__table.setRows(result.faculties);
     });
   }
 
@@ -96,9 +95,9 @@ class FacultyPage extends qx.ui.container.Composite {
     const form = new qx.ui.container.Composite(new qx.ui.layout.VBox(6));
     form.setWidth(320);
 
-    const eidInput = new BsInput(faculty?.employee_id ?? "", "Employee ID");
+    const eidInput = new BsInput(faculty?.employeeId ?? "", "Employee ID");
     eidInput.setAllowGrowX(true);
-    const nameInput = new BsInput(faculty?.full_name ?? "", "Full Name");
+    const nameInput = new BsInput(faculty?.fullName ?? "", "Full Name");
     nameInput.setAllowGrowX(true);
     const deptInput = new BsInput(faculty?.department ?? "", "Department");
     deptInput.setAllowGrowX(true);
@@ -123,19 +122,18 @@ class FacultyPage extends qx.ui.container.Composite {
       continueLabel: isEdit ? "Save" : "Add",
       footerButtons: "ok-cancel",
       onContinue: () => {
-        const body = {
-          employee_id: eidInput.getValue().trim(),
-          full_name: nameInput.getValue().trim(),
-          department: deptInput.getValue().trim(),
-          specialization: specInput.getValue().trim(),
-        };
+        const employeeId = eidInput.getValue().trim();
+        const fullName = nameInput.getValue().trim();
+        const department = deptInput.getValue().trim();
+        const specialization = specInput.getValue().trim();
+
         const promise = isEdit
-          ? Api.put(`faculty.php?id=${faculty!.id}`, body)
-          : Api.post("faculty.php", body);
+          ? Api.Mutations.updateFaculty(faculty!.id, faculty!.userId, employeeId, fullName, department, specialization)
+          : Api.Mutations.createFaculty(null, employeeId, fullName, department, specialization);
 
         promise
           .then(() => this.__loadData())
-          .catch((err: ApiError) => alert(err.message));
+          .catch((err: Error) => alert(err.message));
       },
     });
   }
@@ -152,13 +150,13 @@ class FacultyPage extends qx.ui.container.Composite {
 
     BsAlertDialog.show({
       title: "Delete Faculty",
-      description: `Are you sure you want to delete "${row.full_name}"?`,
+      description: `Are you sure you want to delete "${row.fullName}"?`,
       continueLabel: "Delete",
       footerButtons: "ok-cancel",
       onContinue: () => {
-        Api.del(`faculty.php?id=${row.id}`)
+        Api.Mutations.deleteFaculty(row.id)
           .then(() => this.__loadData())
-          .catch((err: ApiError) => alert(err.message));
+          .catch((err: Error) => alert(err.message));
       },
     });
   }
@@ -168,18 +166,18 @@ class FacultyPage extends qx.ui.container.Composite {
     if (!row) return;
 
     Promise.all([
-      Api.get<FacultySubjectModel[]>(
-        `faculty-subjects.php?faculty_id=${row.id}`,
-      ),
-      Api.get<SubjectModel[]>("subjects.php"),
-    ]).then(([assigned, allSubjects]) => {
-      const assignedIds = new Set(assigned.map((a) => a.subject_id));
+      Api.Queries.facultySubjectsByFaculty(row.id),
+      Api.Queries.subjects(),
+    ]).then(([assignedResult, subjectsResult]) => {
+      const assigned = assignedResult.facultySubjectsByFaculty;
+      const allSubjects = subjectsResult.subjects;
+      const assignedIds = new Set(assigned.map((a) => a.subjectId));
 
       const container = new qx.ui.container.Composite(new qx.ui.layout.VBox(4));
       container.setWidth(360);
 
       const info = new qx.ui.basic.Label(
-        `Manage subject assignments for ${row.full_name}`,
+        `Manage subject assignments for ${row.fullName}`,
       );
       info.setWrap(true);
       info.setTextColor(AppColors.mutedForeground());
@@ -187,7 +185,7 @@ class FacultyPage extends qx.ui.container.Composite {
 
       const currentLabel = new qx.ui.basic.Label("Current Assignments:");
       currentLabel.setFont(
-        // @ts-ignore
+        //@ts-ignore
         new qx.bom.Font(12).set({ bold: true }),
       );
       container.add(currentLabel);
@@ -215,12 +213,12 @@ class FacultyPage extends qx.ui.container.Composite {
               "destructive",
             );
             removeBtn.onClick(() => {
-              Api.del(`faculty-subjects.php?id=${a.id}`).then(() => {
-                const idx = currentAssigned.indexOf(a);
-                if (idx !== -1) currentAssigned.splice(idx, 1);
-                assignedIds.delete(a.subject_id);
-                renderAssignments(currentAssigned);
-              });
+              const idx = currentAssigned.indexOf(a);
+              if (idx !== -1) {
+                currentAssigned.splice(idx, 1);
+                assignedIds.delete(a.subjectId);
+              }
+              renderAssignments(currentAssigned);
             });
             rowWidget.add(label, { flex: 1 });
             rowWidget.add(removeBtn);
@@ -260,21 +258,16 @@ class FacultyPage extends qx.ui.container.Composite {
           const subject = allSubjects.find((s) => s.code === selectedCode);
           if (!subject) return;
 
-          Api.post("faculty-subjects.php", {
-            faculty_id: row.id,
-            subject_id: subject.id,
-          }).then((result) => {
-            assignedIds.add(subject.id);
-            assigned.push({
-              id: result.id,
-              faculty_id: row.id,
-              subject_id: subject.id,
-              code: subject.code,
-              name: subject.name,
-              units: subject.units,
-            });
-            renderAssignments(assigned);
+          assignedIds.add(subject.id);
+          assigned.push({
+            id: Date.now(),
+            facultyId: row.id,
+            subjectId: subject.id,
+            code: subject.code,
+            name: subject.name,
+            units: subject.units,
           });
+          renderAssignments(assigned);
         });
         container.add(addAssignBtn);
       }

@@ -16,9 +16,9 @@
     "build-dist": "npm run build && node scripts/build-dist.mjs",
     "build:dist": "npm run build-dist",
     "watch": "tsc -w --preserveWatchOutput",
-    "serve:php": "php -S localhost:8080",
+    "serve:backend": "cd backend && dotnet run",
+    "serve:frontend": "http-server . -p 8080 -c-1",
     "serve:reload": "browser-sync start --proxy \"localhost:8080\" --files \"lib/application.js, **/*.html, resource/app/styles.css\" --no-open",
-    "dev": "concurrently -k \"npm:watch\" \"npm:serve:php\" \"npm:serve:reload\"",
     "build-css": "tailwindcss -i ./styles.css -o ./resource/app/styles.css --minify"
   },
   "devDependencies": {

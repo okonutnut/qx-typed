@@ -60,8 +60,8 @@ class RoomsPage extends qx.ui.container.Composite {
   }
 
   private __loadData(): void {
-    Api.get<RoomModel[]>("rooms.php").then((data) => {
-      this.__table.setRows(data);
+    Api.Queries.rooms().then((result) => {
+      this.__table.setRows(result.rooms);
     });
   }
 
@@ -94,18 +94,17 @@ class RoomsPage extends qx.ui.container.Composite {
       continueLabel: isEdit ? "Save" : "Add",
       footerButtons: "ok-cancel",
       onContinue: () => {
-        const body = {
-          name: nameInput.getValue().trim(),
-          building: buildingInput.getValue().trim(),
-          capacity: parseInt(capInput.getValue().trim(), 10) || 0,
-        };
+        const name = nameInput.getValue().trim();
+        const building = buildingInput.getValue().trim();
+        const capacity = parseInt(capInput.getValue().trim(), 10) || 0;
+
         const promise = isEdit
-          ? Api.put(`rooms.php?id=${room!.id}`, body)
-          : Api.post("rooms.php", body);
+          ? Api.Mutations.updateRoom(room!.id, name, building, capacity)
+          : Api.Mutations.createRoom(name, building, capacity);
 
         promise
           .then(() => this.__loadData())
-          .catch((err: ApiError) => alert(err.message));
+          .catch((err: Error) => alert(err.message));
       },
     });
   }
@@ -126,9 +125,9 @@ class RoomsPage extends qx.ui.container.Composite {
       continueLabel: "Delete",
       footerButtons: "ok-cancel",
       onContinue: () => {
-        Api.del(`rooms.php?id=${row.id}`)
+        Api.Mutations.deleteRoom(row.id)
           .then(() => this.__loadData())
-          .catch((err: ApiError) => alert(err.message));
+          .catch((err: Error) => alert(err.message));
       },
     });
   }

@@ -10,7 +10,7 @@ class SubjectsPage extends qx.ui.container.Composite {
     const toolbar = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
     if (isAdmin()) {
       const addBtn = new BsButton(
-        "Add New",
+        "New",
         new InlineSvgIcon("plus", 16),
         "btn-sm",
         "primary",
@@ -72,8 +72,8 @@ class SubjectsPage extends qx.ui.container.Composite {
   }
 
   private __loadData(): void {
-    Api.get<SubjectModel[]>("subjects.php").then((data) => {
-      this.__table.setRows(data);
+    Api.Queries.subjects().then((result) => {
+      this.__table.setRows(result.subjects);
     });
   }
 
@@ -114,19 +114,18 @@ class SubjectsPage extends qx.ui.container.Composite {
       continueLabel: isEdit ? "Save" : "Add",
       footerButtons: "ok-cancel",
       onContinue: () => {
-        const body = {
-          code: codeInput.getValue().trim(),
-          name: nameInput.getValue().trim(),
-          units: parseInt(unitsInput.getValue().trim(), 10) || 3,
-          description: descInput.getValue().trim(),
-        };
+        const code = codeInput.getValue().trim();
+        const name = nameInput.getValue().trim();
+        const units = parseInt(unitsInput.getValue().trim(), 10) || 3;
+        const description = descInput.getValue().trim();
+
         const promise = isEdit
-          ? Api.put(`subjects.php?id=${subject!.id}`, body)
-          : Api.post("subjects.php", body);
+          ? Api.Mutations.updateSubject(subject!.id, code, name, units, description)
+          : Api.Mutations.createSubject(code, name, units, description);
 
         promise
           .then(() => this.__loadData())
-          .catch((err: ApiError) => alert(err.message));
+          .catch((err: Error) => alert(err.message));
       },
     });
   }
@@ -147,9 +146,9 @@ class SubjectsPage extends qx.ui.container.Composite {
       continueLabel: "Delete",
       footerButtons: "ok-cancel",
       onContinue: () => {
-        Api.del(`subjects.php?id=${row.id}`)
+        Api.Mutations.deleteSubject(row.id)
           .then(() => this.__loadData())
-          .catch((err: ApiError) => alert(err.message));
+          .catch((err: Error) => alert(err.message));
       },
     });
   }

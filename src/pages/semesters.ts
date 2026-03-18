@@ -35,13 +35,13 @@ class SemestersPage extends qx.ui.container.Composite {
         { headerName: "Name", field: "name", minWidth: 180, flex: 1 },
         {
           headerName: "School Year",
-          field: "school_year",
+          field: "schoolYear",
           minWidth: 160,
           flex: 1,
         },
         {
           headerName: "Status",
-          field: "is_active",
+          field: "isActive",
           minWidth: 120,
           flex: 0,
           valueFormatter: (value) => (value ? "Active" : "Inactive"),
@@ -82,8 +82,8 @@ class SemestersPage extends qx.ui.container.Composite {
   }
 
   private __loadData(): void {
-    Api.get<SemesterModel[]>("semesters.php").then((data) => {
-      this.__table.setRows(data);
+    Api.Queries.semesters().then((result) => {
+      this.__table.setRows(result.semesters);
     });
   }
 
@@ -101,7 +101,7 @@ class SemestersPage extends qx.ui.container.Composite {
     if (semester) nameSelect.setSelectedByLabel(semester.name);
 
     const yearInput = new BsInput(
-      semester?.school_year ?? "",
+      semester?.schoolYear ?? "",
       "School Year (e.g. 2025-2026)",
     );
     yearInput.setAllowGrowX(true);
@@ -117,21 +117,19 @@ class SemestersPage extends qx.ui.container.Composite {
       continueLabel: isEdit ? "Save" : "Add",
       footerButtons: "ok-cancel",
       onContinue: () => {
-        const body = {
-          name: nameSelect.getSelectedValue(),
-          school_year: yearInput.getValue().trim(),
-        };
-        if (!body.name || !body.school_year) {
+        const name = nameSelect.getSelectedValue();
+        const schoolYear = yearInput.getValue().trim();
+        if (!name || !schoolYear) {
           alert("All fields are required");
           return;
         }
         const promise = isEdit
-          ? Api.put(`semesters.php?id=${semester!.id}`, body)
-          : Api.post("semesters.php", body);
+          ? Api.Mutations.updateSemester(semester!.id, name, schoolYear, semester!.isActive)
+          : Api.Mutations.createSemester(name, schoolYear, 0);
 
         promise
           .then(() => this.__loadData())
-          .catch((err: ApiError) => alert(err.message));
+          .catch((err: Error) => alert(err.message));
       },
     });
   }
@@ -140,9 +138,9 @@ class SemestersPage extends qx.ui.container.Composite {
     const row = this.__getSelectedRow();
     if (!row) return;
 
-    Api.put(`semesters.php?id=${row.id}&activate=1`, {})
+    Api.Mutations.updateSemester(row.id, row.name, row.schoolYear, 1)
       .then(() => this.__loadData())
-      .catch((err: ApiError) => alert(err.message));
+      .catch((err: Error) => alert(err.message));
   }
 
   private __editSelected(): void {
@@ -157,13 +155,13 @@ class SemestersPage extends qx.ui.container.Composite {
 
     BsAlertDialog.show({
       title: "Delete Semester",
-      description: `Are you sure you want to delete "${row.name} (${row.school_year})"?`,
+      description: `Are you sure you want to delete "${row.name} (${row.schoolYear})"?`,
       continueLabel: "Delete",
       footerButtons: "ok-cancel",
       onContinue: () => {
-        Api.del(`semesters.php?id=${row.id}`)
+        Api.Mutations.deleteSemester(row.id)
           .then(() => this.__loadData())
-          .catch((err: ApiError) => alert(err.message));
+          .catch((err: Error) => alert(err.message));
       },
     });
   }
