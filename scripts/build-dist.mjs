@@ -123,6 +123,54 @@ function copyRequiredProjectFiles() {
     path.join(rootDir, "lib", "application.js"),
     path.join(distDir, "lib", "application.js"),
   );
+  copyFileIfPresent(
+    path.join(
+      rootDir,
+      "node_modules",
+      "ag-grid-community",
+      "dist",
+      "ag-grid-community.min.noStyle.js",
+    ),
+    path.join(
+      distDir,
+      "node_modules",
+      "ag-grid-community",
+      "dist",
+      "ag-grid-community.min.noStyle.js",
+    ),
+  );
+  copyFileIfPresent(
+    path.join(
+      rootDir,
+      "node_modules",
+      "ag-grid-community",
+      "styles",
+      "ag-grid.min.css",
+    ),
+    path.join(
+      distDir,
+      "node_modules",
+      "ag-grid-community",
+      "styles",
+      "ag-grid.min.css",
+    ),
+  );
+  copyFileIfPresent(
+    path.join(
+      rootDir,
+      "node_modules",
+      "ag-grid-community",
+      "styles",
+      "ag-theme-quartz-no-font.min.css",
+    ),
+    path.join(
+      distDir,
+      "node_modules",
+      "ag-grid-community",
+      "styles",
+      "ag-theme-quartz-no-font.min.css",
+    ),
+  );
 }
 
 function copyResourceWithFilteredIcons(usedIcons) {

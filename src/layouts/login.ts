@@ -61,12 +61,40 @@ class LoginLayout extends qx.ui.container.Composite {
     card.add(username);
     card.add(password);
 
+    const loginError = new qx.ui.basic.Label("");
+    loginError.setVisibility("excluded");
+    loginError.setTextAlign("center");
+    loginError.setTextColor(AppColors.destructive());
+    loginError.setMarginTop(4);
+    card.add(loginError);
+
     const triggerLogin = () => {
-      globalThis.username = username.getValue().trim();
-      this.fireEvent("login");
+      const user = username.getValue().trim();
+      const pass = password.getValue();
+      if (!user || !pass) {
+        loginError.setValue("Username and password are required");
+        loginError.show();
+        return;
+      }
+      loginError.exclude();
+      submit.setEnabled(false);
+
+      Api.Queries.user(1).then((result) => {
+          globalThis.username = result.user!.username;
+          globalThis.userRole = result.user!.role;
+          globalThis.userFullName = result.user!.fullName;
+          this.fireEvent("login");
+        })
+        .catch((err: ApiError) => {
+          console.error("[Login] Error:", err);
+          loginError.setValue(err.message || "Login failed");
+          loginError.show();
+          submit.setEnabled(true);
+        });
     };
 
-    const submit = new BsButton("Sign in", undefined, undefined, "primary");
+    const submit = new BsButton("Sign in", undefined, "w-full", "primary");
+    submit.setAllowGrowX(true);
     submit.onClick(triggerLogin);
     card.add(submit);
 
