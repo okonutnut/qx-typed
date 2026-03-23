@@ -109,7 +109,7 @@ The project includes a custom component library prefixed with `Bs` (Basecoat):
 
 | Component | Description |
 |-----------|-------------|
-| `BsButton` | Button with variants (primary, secondary, destructive, etc.), icons, and click events |
+| `BsButton` | Button with variants (default, secondary, destructive, outline, ghost, link) and sizes (default, sm, lg, icon) |
 | `BsInput` | Text input field with label, error state, and styling |
 | `BsPassword` | Password input with visibility toggle |
 | `BsTextarea` | Multi-line text input |
@@ -124,8 +124,9 @@ The project includes a custom component library prefixed with `Bs` (Basecoat):
 
 **Usage Example:**
 ```typescript
-const btn = new BsButton("Submit", new InlineSvgIcon("check"), "btn-primary", "primary");
-btn.addListener("execute", () => { /* handler */ });
+const btn = new BsButton("Submit", new InlineSvgIcon("check"), { variant: "default", size: "sm" });
+btn.onClick(() => { /* handler */ });
+// Or with icon-only: new BsButton("", new InlineSvgIcon("plus"), { size: "icon", variant: "default" });
 ```
 
 **Note:** `BsAlertDialog` appends a native `<dialog>` to `document.body` rather than being a qooxdoo widget.

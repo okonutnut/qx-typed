@@ -12,8 +12,7 @@ class FacultyPage extends qx.ui.container.Composite {
       const addBtn = new BsButton(
         "Add New",
         new InlineSvgIcon("plus", 16),
-        "btn-sm",
-        "primary",
+        { size: "sm", variant: "default" },
       );
       addBtn.onClick(() => this.__showFormDialog());
       toolbar.add(addBtn);
@@ -22,7 +21,7 @@ class FacultyPage extends qx.ui.container.Composite {
     const refreshBtn = new BsButton(
       "Refresh",
       new InlineSvgIcon("refresh-cw", 16),
-      "btn-sm-outline",
+      { size: "sm", variant: "outline" },
     );
     refreshBtn.onClick(() => this.__loadData());
     toolbar.add(refreshBtn);
@@ -55,20 +54,18 @@ class FacultyPage extends qx.ui.container.Composite {
 
     if (isAdmin()) {
       const actionBar = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
-      const editBtn = new BsButton("Edit", undefined, "btn-sm-outline");
+      const editBtn = new BsButton("Edit", undefined, { size: "sm", variant: "outline" });
       editBtn.onClick(() => this.__editSelected());
       const deleteBtn = new BsButton(
         "Delete",
         undefined,
-        "btn-sm-destructive",
-        "destructive",
+        { size: "sm", variant: "destructive" },
       );
       deleteBtn.onClick(() => this.__deleteSelected());
       const assignBtn = new BsButton(
         "Assign",
         undefined,
-        "btn-sm-secondary",
-        "secondary",
+        { size: "sm", variant: "secondary" },
       );
       assignBtn.onClick(() => this.__assignSubjects());
       actionBar.add(editBtn);
@@ -209,8 +206,7 @@ class FacultyPage extends qx.ui.container.Composite {
             const removeBtn = new BsButton(
               "Remove",
               undefined,
-              "btn-sm",
-              "destructive",
+              { size: "sm", variant: "destructive" },
             );
             removeBtn.onClick(() => {
               const idx = currentAssigned.indexOf(a);
@@ -248,8 +244,7 @@ class FacultyPage extends qx.ui.container.Composite {
         const addAssignBtn = new BsButton(
           "Assign",
           undefined,
-          "btn-sm",
-          "primary",
+          { size: "sm", variant: "default" },
         );
         addAssignBtn.onClick(() => {
           const selectedLabel = subjectSelect.getSelectedValue();

@@ -14,18 +14,8 @@ interface BsAvatar {
 }
 
 interface BsButton {
-  getVariant():
-    | "neutral"
-    | "primary"
-    | "secondary"
-    | "accent"
-    | "info"
-    | "success"
-    | "warning"
-    | "destructive"
-    | "outline"
-    | "ghost"
-    | "link";
+  getVariant(): "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
+  getSize(): "default" | "sm" | "lg" | "icon";
   onClick(handler: () => void): this;
 }
 

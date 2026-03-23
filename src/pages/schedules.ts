@@ -30,8 +30,7 @@ class SchedulesPage extends qx.ui.container.Composite {
       const addBtn = new BsButton(
         "Add Schedule",
         new InlineSvgIcon("plus", 16),
-        "btn-sm",
-        "primary",
+        { size: "sm", variant: "default" },
       );
       addBtn.onClick(() => this.__showFormDialog());
       toolbar.add(addBtn);
@@ -40,8 +39,7 @@ class SchedulesPage extends qx.ui.container.Composite {
     const refreshBtn = new BsButton(
       "Refresh",
       new InlineSvgIcon("refresh-cw", 16),
-      "btn-sm",
-      "outline",
+      { size: "sm", variant: "outline" },
     );
     refreshBtn.onClick(() => this.__loadAll());
     toolbar.add(refreshBtn);
@@ -76,13 +74,12 @@ class SchedulesPage extends qx.ui.container.Composite {
 
     if (isAdmin()) {
       const actionBar = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
-      const editBtn = new BsButton("Edit", undefined, "btn-sm", "outline");
+      const editBtn = new BsButton("Edit", undefined, { size: "sm", variant: "outline" });
       editBtn.onClick(() => this.__editSelected());
       const deleteBtn = new BsButton(
         "Delete",
         undefined,
-        "btn-sm",
-        "destructive",
+        { size: "sm", variant: "destructive" },
       );
       deleteBtn.onClick(() => this.__deleteSelected());
       actionBar.add(editBtn);
