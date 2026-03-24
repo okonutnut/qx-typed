@@ -12,6 +12,7 @@
     "tailwindcss": "^4.2.1"
   },
   "scripts": {
+    "dev": "concurrently \"npm run watch\" \"npm run serve:frontend\" \"npm run serve:backend\"",
     "build": "npm run build-css && tsc",
     "build-dist": "npm run build && node scripts/build-dist.mjs",
     "build:dist": "npm run build-dist",

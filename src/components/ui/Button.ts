@@ -84,15 +84,17 @@ class BsButton extends qx.ui.basic.Atom {
     const tabIndexAttr = 'tabindex="-1"';
     const variantClass = this.__resolveVariantClass();
     const sizeClass = this.__resolveSizeClass();
-    const classes = ["btn", this.__className, variantClass, sizeClass]
+    const classes = [variantClass, sizeClass, this.__className]
       .filter(Boolean)
       .join(" ");
 
     this.__htmlButton.setHtml(`
-      <button type="button" class="${classes}" ${tabIndexAttr}>
-        ${iconPart}
-        ${this.__buttonText}
-      </button>
+      <div class="p-1">
+        <button type="button" class="${classes}" ${tabIndexAttr}>
+          ${iconPart}
+          ${this.__buttonText}
+        </button>
+      </div>
     `);
 
     qx.event.Timer.once(() => this.__bindNativeButton(), this, 0);

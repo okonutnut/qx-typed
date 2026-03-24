@@ -62,7 +62,7 @@ class Sidebar extends qx.ui.container.Composite {
     header.setTextColor(AppColors.sidebarForeground());
     this.add(header);
 
-    const appVersion = new qx.ui.basic.Label("SIAS Online x.xx");
+    const appVersion = new qx.ui.basic.Label("Class Scheduler v1.0.0");
     this.__appVersion = appVersion;
     appVersion.setTextColor(AppColors.sidebarForeground());
     appVersion.setTextAlign("center");

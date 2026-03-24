@@ -102,6 +102,7 @@ class AgGridTable<T> extends qx.ui.container.Composite {
     }));
 
     this.__gridApi = window.agGrid.createGrid(gridElement, {
+      theme: "legacy",
       columnDefs,
       rowData: this.__rows,
       rowSelection: {

@@ -1,6 +1,7 @@
 {
-  "name": "SIAS App",
-  "short_name": "SIAS",
+  "id": "/",
+  "name": "Class Scheduler",
+  "short_name": "Scheduler",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
