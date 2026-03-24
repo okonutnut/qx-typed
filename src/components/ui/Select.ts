@@ -75,7 +75,7 @@ class BsSelect extends qx.ui.basic.Atom {
 
     this.__htmlSelect.setHtml(`
       <div class="p-1">
-        <select class="${classes}" ${tabIndexAttr}>
+        <select class="w-full ${classes}" ${tabIndexAttr}>
           ${optionsHtml}
         </select>
       </div>

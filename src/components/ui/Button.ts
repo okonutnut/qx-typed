@@ -5,7 +5,7 @@ type BsButtonVariant =
   | "outline"
   | "ghost"
   | "link";
-type BsButtonSize = "default" | "sm" | "lg" | "icon";
+type BsButtonSize = "default" | "sm" | "lg" | "icon" | "sm-icon" | "lg-icon";
 
 class BsButton extends qx.ui.basic.Atom {
   static events = {
@@ -78,8 +78,9 @@ class BsButton extends qx.ui.basic.Atom {
   }
 
   private __renderButton(): void {
+    const isIconSize = this.__size === "icon" || this.__size === "sm-icon";
     const iconPart = this.__iconHtml
-      ? `<span class="me-2">${this.__iconHtml}</span>`
+      ? `<span class="${isIconSize ? "" : "me-2"}">${this.__iconHtml}</span>`
       : "";
     const tabIndexAttr = 'tabindex="-1"';
     const variantClass = this.__resolveVariantClass();
@@ -90,7 +91,7 @@ class BsButton extends qx.ui.basic.Atom {
 
     this.__htmlButton.setHtml(`
       <div class="p-1">
-        <button type="button" class="${classes}" ${tabIndexAttr}>
+        <button type="button" class="w-full ${classes}" ${tabIndexAttr}>
           ${iconPart}
           ${this.__buttonText}
         </button>
@@ -101,27 +102,27 @@ class BsButton extends qx.ui.basic.Atom {
   }
 
   private __resolveVariantClass(): string {
-    const variantClassMap: Record<BsButtonVariant, string> = {
-      default: "btn-primary",
-      secondary: "btn-secondary",
-      destructive: "btn-destructive",
-      outline: "btn-outline",
-      ghost: "btn-ghost",
-      link: "btn-link",
+    const variantMap: Record<BsButtonVariant, string> = {
+      default: "primary",
+      secondary: "secondary",
+      destructive: "destructive",
+      outline: "outline",
+      ghost: "ghost",
+      link: "link",
     };
 
-    return variantClassMap[this.__variant];
+    const variantSuffix = variantMap[this.__variant];
+    const isIconSize = this.__size === "icon" || this.__size === "sm-icon" || this.__size === "lg-icon";
+    const sizePrefix = isIconSize ? "icon" : this.__size;
+
+    if (sizePrefix === "default") {
+      return `btn-${variantSuffix}`;
+    }
+    return `btn-${sizePrefix}-${variantSuffix}`;
   }
 
   private __resolveSizeClass(): string {
-    const sizeClassMap: Record<BsButtonSize, string> = {
-      default: "",
-      sm: "btn-sm",
-      lg: "btn-lg",
-      icon: "btn-icon",
-    };
-
-    return sizeClassMap[this.__size];
+    return "";
   }
 
   public getVariant(): BsButtonVariant {

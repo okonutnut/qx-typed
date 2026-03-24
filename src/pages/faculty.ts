@@ -10,7 +10,7 @@ class FacultyPage extends qx.ui.container.Composite {
     const toolbar = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
     if (isAdmin()) {
       const addBtn = new BsButton(
-        "Add New",
+        "New",
         new InlineSvgIcon("plus", 16),
         { size: "sm", variant: "default" },
       );

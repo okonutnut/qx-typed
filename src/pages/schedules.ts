@@ -19,8 +19,8 @@ class SchedulesPage extends qx.ui.container.Composite {
     semLabel.setAlignY("middle");
     toolbar.add(semLabel);
 
-    this.__semesterSelect = new BsSelect([], "select-bordered select-sm");
-    this.__semesterSelect.setWidth(220);
+    this.__semesterSelect = new BsSelect([]);
+    this.__semesterSelect.setWidth(500);
     this.__semesterSelect.onChange(() => this.__loadSchedules());
     toolbar.add(this.__semesterSelect);
 
@@ -28,7 +28,7 @@ class SchedulesPage extends qx.ui.container.Composite {
 
     if (isAdmin()) {
       const addBtn = new BsButton(
-        "Add Schedule",
+        "New",
         new InlineSvgIcon("plus", 16),
         { size: "sm", variant: "default" },
       );
