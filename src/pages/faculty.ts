@@ -79,12 +79,15 @@ class FacultyPage extends qx.ui.container.Composite {
 
   private __loadData(): void {
     Api.Queries.faculties().then((result) => {
+      console.log("[FacultyPage] Loaded faculties:", result.faculties);
       this.__table.setRows(result.faculties);
     });
   }
 
   private __getSelectedRow(): FacultyModel | null {
-    return this.__table.getSelectedRow();
+    const row = this.__table.getSelectedRow();
+    console.log("[FacultyPage] __getSelectedRow:", row);
+    return row;
   }
 
   private __showFormDialog(faculty?: FacultyModel): void {
@@ -137,12 +140,14 @@ class FacultyPage extends qx.ui.container.Composite {
 
   private __editSelected(): void {
     const row = this.__getSelectedRow();
+    console.log("[FacultyPage] __editSelected, row:", row);
     if (!row) return;
     this.__showFormDialog(row);
   }
 
   private __deleteSelected(): void {
     const row = this.__getSelectedRow();
+    console.log("[FacultyPage] __deleteSelected, row:", row);
     if (!row) return;
 
     BsAlertDialog.show({
@@ -151,8 +156,12 @@ class FacultyPage extends qx.ui.container.Composite {
       continueLabel: "Delete",
       footerButtons: "ok-cancel",
       onContinue: () => {
+        console.log("[FacultyPage] Calling deleteFaculty with id:", row.id);
         Api.Mutations.deleteFaculty(row.id)
-          .then(() => this.__loadData())
+          .then((result) => {
+            console.log("[FacultyPage] Delete result:", result);
+            this.__loadData();
+          })
           .catch((err: Error) => alert(err.message));
       },
     });

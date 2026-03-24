@@ -9,6 +9,7 @@ async function gql<T = any>(
   query: string,
   variables?: Record<string, any>
 ): Promise<T> {
+  console.log("[API] Query:", query.substring(0, 100), "variables:", variables);
   const response = await fetch(GRAPHQL_ENDPOINT, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -16,6 +17,7 @@ async function gql<T = any>(
   });
 
   const result: GraphQLResponse<T> = await response.json();
+  console.log("[API] Response:", result);
 
   if (result.errors && result.errors.length > 0) {
     throw new Error(result.errors[0].message);

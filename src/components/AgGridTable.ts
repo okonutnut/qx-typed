@@ -1,181 +1,107 @@
-type AgGridValueGetter<T> = (row: T) => any;
-
-type AgGridTableColumn<T> = {
+type TableColumn = {
   headerName: string;
-  field?: keyof T & string;
-  hide?: boolean;
-  minWidth?: number;
+  field?: string;
   width?: number;
+  minWidth?: number;
   flex?: number;
-  sortable?: boolean;
-  filter?: boolean;
-  valueGetter?: AgGridValueGetter<T>;
-  valueFormatter?: (value: any, row: T) => string;
+  hide?: boolean;
+  valueGetter?: (row: any) => any;
+  valueFormatter?: (value: any, row: any) => string;
 };
 
-type AgGridTableOptions<T> = {
+type TableOptions = {
   emptyMessage?: string;
-  rowId?: (row: T) => string;
+  rowId?: (row: any) => string;
 };
 
 class AgGridTable<T> extends qx.ui.container.Composite {
-  private __html: qx.ui.embed.Html;
-  private __columns: AgGridTableColumn<T>[];
+  private __columns: TableColumn[];
   private __rows: T[] = [];
-  private __gridApi: any = null;
+  private __table: qx.ui.table.Table;
+  private __tableModel: qx.ui.table.model.Simple;
   private __selectedRow: T | null = null;
-  private __options: AgGridTableOptions<T>;
-  private __gridId = `ag-grid-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
+  private __options: TableOptions;
 
-  constructor(columns: AgGridTableColumn<T>[], options?: AgGridTableOptions<T>) {
+  constructor(columns: TableColumn[], options?: TableOptions) {
     super(new qx.ui.layout.Grow());
 
     this.__columns = columns;
     this.__options = options ?? {};
 
-    this.__html = new qx.ui.embed.Html(`
-      <div class="app-ag-grid-shell">
-        <div id="${this.__gridId}" class="ag-theme-quartz app-ag-grid-theme"></div>
-      </div>
-    `);
-    this.__html.setMinHeight(420);
-    this.add(this.__html);
+    this.__tableModel = new qx.ui.table.model.Simple();
+    const model = this.__tableModel as any;
+    model.setColumns(
+      this.__columns.map((c) => c.headerName),
+      this.__columns.map((c) => c.field ?? "")
+    );
 
-    this.addListenerOnce("appear", () => this.__ensureGrid());
-    this.addListener("resize", () => this.__sizeColumnsToFit());
+    this.__table = new qx.ui.table.Table(this.__tableModel);
+    this.__table.setShowCellFocusIndicator(true);
+    this.__table.setRowHeight(32);
+    this.__table.setHeaderCellHeight(36);
+
+    const columnModel = this.__table.getTableColumnModel() as any;
+    this.__columns.forEach((col, idx) => {
+      if (col.width) {
+        columnModel.setColumnWidth(idx, col.width);
+      }
+    });
+
+    this.__table.getSelectionModel().setSelectionMode(qx.ui.table.selection.Model.SINGLE_SELECTION);
+    
+    this.__table.getSelectionModel().addListener("changeSelection", () => {
+      const selModel = this.__table.getSelectionModel();
+      
+      let selectedIndex = -1;
+      selModel.iterateSelection((idx: number) => {
+        selectedIndex = idx;
+        return false;
+      }, this);
+      
+      console.log("[AgGridTable] Selection changed, index:", selectedIndex, "rows:", this.__rows.length);
+      if (selectedIndex >= 0 && this.__rows[selectedIndex]) {
+        this.__selectedRow = this.__rows[selectedIndex];
+        console.log("[AgGridTable] Selected row:", this.__selectedRow);
+      } else {
+        this.__selectedRow = null;
+      }
+    });
+
+    this.add(this.__table);
+    console.log("[AgGridTable] Table created");
   }
 
   setRows(rows: T[]): void {
     this.__rows = rows.slice();
-    if (this.__gridApi) {
-      this.__gridApi.setGridOption("rowData", this.__rows);
-      this.__syncSelection();
-      this.__updateOverlay();
-      this.__sizeColumnsToFit();
-    }
+    console.log("[AgGridTable] setRows called with", rows.length, "rows");
+    console.log("[AgGridTable] First row sample:", this.__rows[0]);
+    
+    const data = this.__rows.map((row) => {
+      return this.__columns.map((col) => {
+        if (col.hide) {
+          return "";
+        }
+        if (col.valueGetter) {
+          const value = col.valueGetter(row);
+          return value !== undefined && value !== null ? String(value) : "";
+        }
+        if (col.field) {
+          const value = (row as any)[col.field];
+          if (col.valueFormatter && value !== undefined && value !== null) {
+            return col.valueFormatter(value, row);
+          }
+          return value !== undefined && value !== null ? String(value) : "";
+        }
+        return "";
+      });
+    });
+    
+    console.log("[AgGridTable] Setting data:", data.length, "rows");
+    this.__tableModel.setData(data);
   }
 
   getSelectedRow(): T | null {
+    console.log("[AgGridTable] getSelectedRow returning:", this.__selectedRow);
     return this.__selectedRow;
-  }
-
-  private __ensureGrid(): void {
-    if (this.__gridApi) {
-      return;
-    }
-
-    const root = this.__html.getContentElement().getDomElement();
-    const gridElement = root?.querySelector(`#${this.__gridId}`) as HTMLElement | null;
-    if (!gridElement) {
-      qx.event.Timer.once(() => this.__ensureGrid(), this, 0);
-      return;
-    }
-
-    if (!window.agGrid?.createGrid) {
-      this.__html.setHtml(`
-        <div class="app-ag-grid-shell">
-          <div class="app-ag-grid-error">
-            AG Grid failed to load. Check the local asset paths in index.html.
-          </div>
-        </div>
-      `);
-      return;
-    }
-
-    const columnDefs = this.__columns.map((column) => ({
-      headerName: column.headerName,
-      field: column.field,
-      hide: column.hide ?? false,
-      minWidth: column.minWidth ?? 120,
-      width: column.width,
-      flex: column.flex ?? (column.width ? undefined : 1),
-      sortable: column.sortable ?? true,
-      filter: column.filter ?? true,
-      resizable: true,
-      valueGetter: column.valueGetter
-        ? (params: any) => column.valueGetter!(params.data as T)
-        : undefined,
-      valueFormatter: column.valueFormatter
-        ? (params: any) =>
-            column.valueFormatter!(params.value, params.data as T)
-        : undefined,
-    }));
-
-    this.__gridApi = window.agGrid.createGrid(gridElement, {
-      theme: "legacy",
-      columnDefs,
-      rowData: this.__rows,
-      rowSelection: {
-        mode: "singleRow",
-        enableClickSelection: true,
-      },
-      defaultColDef: {
-        sortable: true,
-        filter: true,
-        resizable: true,
-        floatingFilter: false,
-      },
-      animateRows: true,
-      suppressCellFocus: true,
-      pagination: true,
-      paginationPageSize: 10,
-      paginationPageSizeSelector: [10, 20, 50],
-      overlayNoRowsTemplate: `<span>${this.__options.emptyMessage ?? "No records found."}</span>`,
-      getRowId: this.__options.rowId
-        ? (params: any) => this.__options.rowId!(params.data as T)
-        : undefined,
-      onSelectionChanged: () => {
-        const selectedRows = this.__gridApi.getSelectedRows() as T[];
-        this.__selectedRow = selectedRows[0] ?? null;
-      },
-      onGridReady: () => {
-        this.__updateOverlay();
-        this.__sizeColumnsToFit();
-      },
-    });
-
-    this.__updateOverlay();
-    this.__sizeColumnsToFit();
-  }
-
-  private __syncSelection(): void {
-    if (!this.__selectedRow || !this.__gridApi) {
-      return;
-    }
-
-    const selectedRow = this.__selectedRow;
-    let matchFound = false;
-    this.__gridApi.forEachNode((node: any) => {
-      const isMatch = node.data === selectedRow;
-      node.setSelected(isMatch);
-      if (isMatch) {
-        matchFound = true;
-      }
-    });
-
-    if (!matchFound) {
-      this.__selectedRow = null;
-    }
-  }
-
-  private __updateOverlay(): void {
-    if (!this.__gridApi) {
-      return;
-    }
-    this.__gridApi.setGridOption(
-      "activeOverlay",
-      this.__rows.length === 0 ? "agNoRowsOverlay" : undefined,
-    );
-  }
-
-  private __sizeColumnsToFit(): void {
-    if (!this.__gridApi) {
-      return;
-    }
-    qx.event.Timer.once(() => {
-      if (this.__gridApi && !this.__gridApi.isDestroyed()) {
-        this.__gridApi.sizeColumnsToFit();
-      }
-    }, this, 0);
   }
 }
