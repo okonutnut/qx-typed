@@ -79,10 +79,18 @@ class LoginLayout extends qx.ui.container.Composite {
       loginError.exclude();
       submit.setEnabled(false);
 
-      Api.Queries.user(1).then((result) => {
-          globalThis.username = result.user!.username;
-          globalThis.userRole = result.user!.role;
-          globalThis.userFullName = result.user!.fullName;
+      Api.Queries.users().then((result) => {
+          const foundUser = result.users.find(u => u.username === user && u.password === pass);
+          if (!foundUser) {
+            loginError.setValue("Invalid username or password");
+            loginError.show();
+            submit.setEnabled(true);
+            return;
+          }
+          globalThis.username = foundUser.username;
+          globalThis.userRole = foundUser.role;
+          globalThis.userFullName = foundUser.fullName;
+          console.log("[Login] Logged in as:", globalThis.username, "role:", globalThis.userRole);
           this.fireEvent("login");
         })
         .catch((err: ApiError) => {

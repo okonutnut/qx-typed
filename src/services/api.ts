@@ -31,7 +31,7 @@ async function gql<T = any>(
 }
 
 const Queries = {
-  users: () => gql<{ users: UserModel[] }>(`query { users { id username fullName: fullName role } }`),
+  users: () => gql<{ users: UserModel[] }>(`query { users { id username password: password fullName: fullName role } }`),
   user: (id: number) => gql<{ user: UserModel | null }>(`query($id: Int!) { user(id: $id) { id username fullName: fullName role } }`, { id }),
 
   subjects: () => gql<{ subjects: SubjectModel[] }>(`query { subjects { id code name units description } }`),

@@ -4,31 +4,37 @@ namespace Backend.Mutations;
 
 public class Mutation
 {
-    private static readonly List<SubjectModel> _subjects = new()
+    public static readonly List<UserModel> Users = new()
+    {
+        new() { Id = 1, Username = "admin", Password = "admin123", FullName = "Administrator", Role = "admin" },
+        new() { Id = 2, Username = "jsmith", Password = "faculty123", FullName = "John Smith", Role = "faculty" }
+    };
+
+    public static readonly List<SubjectModel> Subjects = new()
     {
         new() { Id = 1, Code = "CS101", Name = "Introduction to Computer Science", Units = 3, Description = "Basic concepts of programming" },
         new() { Id = 2, Code = "MATH201", Name = "Calculus II", Units = 4, Description = "Advanced calculus" }
     };
 
-    private static readonly List<FacultyModel> _faculties = new()
+    public static readonly List<FacultyModel> Faculties = new()
     {
         new() { Id = 1, UserId = 2, EmployeeId = "FAC001", FullName = "John Smith", Department = "Computer Science", Specialization = "Software Engineering" },
         new() { Id = 2, UserId = null, EmployeeId = "FAC002", FullName = "Alice Johnson", Department = "Mathematics", Specialization = "Applied Mathematics" }
     };
 
-    private static readonly List<RoomModel> _rooms = new()
+    public static readonly List<RoomModel> Rooms = new()
     {
         new() { Id = 1, Name = "101", Building = "Main Hall", Capacity = 30 },
         new() { Id = 2, Name = "202", Building = "Science Building", Capacity = 50 }
     };
 
-    private static readonly List<SemesterModel> _semesters = new()
+    public static readonly List<SemesterModel> Semesters = new()
     {
         new() { Id = 1, Name = "1st Semester", SchoolYear = "2025-2026", IsActive = 1 },
         new() { Id = 2, Name = "2nd Semester", SchoolYear = "2025-2026", IsActive = 0 }
     };
 
-    private static readonly List<ScheduleModel> _schedules = new()
+    public static readonly List<ScheduleModel> Schedules = new()
     {
         new()
         {
@@ -57,13 +63,13 @@ public class Mutation
             Units = units,
             Description = description
         };
-        _subjects.Add(subject);
+        Subjects.Add(subject);
         return subject;
     }
 
     public SubjectModel? UpdateSubject(int id, string code, string name, int units, string description)
     {
-        var subject = _subjects.FirstOrDefault(s => s.Id == id);
+        var subject = Subjects.FirstOrDefault(s => s.Id == id);
         if (subject == null) return null;
 
         subject.Code = code;
@@ -75,9 +81,9 @@ public class Mutation
 
     public bool DeleteSubject(int id)
     {
-        var subject = _subjects.FirstOrDefault(s => s.Id == id);
+        var subject = Subjects.FirstOrDefault(s => s.Id == id);
         if (subject == null) return false;
-        return _subjects.Remove(subject);
+        return Subjects.Remove(subject);
     }
 
     public FacultyModel CreateFaculty(int? userId, string employeeId, string fullName, string department, string specialization)
@@ -91,13 +97,13 @@ public class Mutation
             Department = department,
             Specialization = specialization
         };
-        _faculties.Add(faculty);
+        Faculties.Add(faculty);
         return faculty;
     }
 
     public FacultyModel? UpdateFaculty(int id, int? userId, string employeeId, string fullName, string department, string specialization)
     {
-        var faculty = _faculties.FirstOrDefault(f => f.Id == id);
+        var faculty = Faculties.FirstOrDefault(f => f.Id == id);
         if (faculty == null) return null;
 
         faculty.UserId = userId;
@@ -110,9 +116,9 @@ public class Mutation
 
     public bool DeleteFaculty(int id)
     {
-        var faculty = _faculties.FirstOrDefault(f => f.Id == id);
+        var faculty = Faculties.FirstOrDefault(f => f.Id == id);
         if (faculty == null) return false;
-        return _faculties.Remove(faculty);
+        return Faculties.Remove(faculty);
     }
 
     public RoomModel CreateRoom(string name, string building, int capacity)
@@ -124,13 +130,13 @@ public class Mutation
             Building = building,
             Capacity = capacity
         };
-        _rooms.Add(room);
+        Rooms.Add(room);
         return room;
     }
 
     public RoomModel? UpdateRoom(int id, string name, string building, int capacity)
     {
-        var room = _rooms.FirstOrDefault(r => r.Id == id);
+        var room = Rooms.FirstOrDefault(r => r.Id == id);
         if (room == null) return null;
 
         room.Name = name;
@@ -141,16 +147,16 @@ public class Mutation
 
     public bool DeleteRoom(int id)
     {
-        var room = _rooms.FirstOrDefault(r => r.Id == id);
+        var room = Rooms.FirstOrDefault(r => r.Id == id);
         if (room == null) return false;
-        return _rooms.Remove(room);
+        return Rooms.Remove(room);
     }
 
     public SemesterModel CreateSemester(string name, string schoolYear, int isActive)
     {
         if (isActive == 1)
         {
-            foreach (var sem in _semesters)
+            foreach (var sem in Semesters)
             {
                 sem.IsActive = 0;
             }
@@ -163,18 +169,18 @@ public class Mutation
             SchoolYear = schoolYear,
             IsActive = isActive
         };
-        _semesters.Add(semester);
+        Semesters.Add(semester);
         return semester;
     }
 
     public SemesterModel? UpdateSemester(int id, string name, string schoolYear, int isActive)
     {
-        var semester = _semesters.FirstOrDefault(s => s.Id == id);
+        var semester = Semesters.FirstOrDefault(s => s.Id == id);
         if (semester == null) return null;
 
         if (isActive == 1)
         {
-            foreach (var sem in _semesters)
+            foreach (var sem in Semesters)
             {
                 sem.IsActive = 0;
             }
@@ -188,19 +194,19 @@ public class Mutation
 
     public bool DeleteSemester(int id)
     {
-        var semester = _semesters.FirstOrDefault(s => s.Id == id);
+        var semester = Semesters.FirstOrDefault(s => s.Id == id);
         if (semester == null) return false;
-        return _semesters.Remove(semester);
+        return Semesters.Remove(semester);
     }
 
     public ScheduleModel CreateSchedule(
         int subjectId, int facultyId, int roomId, int semesterId,
         string dayOfWeek, string startTime, string endTime)
     {
-        var subject = _subjects.FirstOrDefault(s => s.Id == subjectId);
-        var faculty = _faculties.FirstOrDefault(f => f.Id == facultyId);
-        var room = _rooms.FirstOrDefault(r => r.Id == roomId);
-        var semester = _semesters.FirstOrDefault(s => s.Id == semesterId);
+        var subject = Subjects.FirstOrDefault(s => s.Id == subjectId);
+        var faculty = Faculties.FirstOrDefault(f => f.Id == facultyId);
+        var room = Rooms.FirstOrDefault(r => r.Id == roomId);
+        var semester = Semesters.FirstOrDefault(s => s.Id == semesterId);
 
         var schedule = new ScheduleModel
         {
@@ -221,7 +227,7 @@ public class Mutation
             SemesterName = semester?.Name ?? "",
             SchoolYear = semester?.SchoolYear ?? ""
         };
-        _schedules.Add(schedule);
+        Schedules.Add(schedule);
         return schedule;
     }
 
@@ -229,13 +235,13 @@ public class Mutation
         int id, int subjectId, int facultyId, int roomId, int semesterId,
         string dayOfWeek, string startTime, string endTime)
     {
-        var schedule = _schedules.FirstOrDefault(s => s.Id == id);
+        var schedule = Schedules.FirstOrDefault(s => s.Id == id);
         if (schedule == null) return null;
 
-        var subject = _subjects.FirstOrDefault(s => s.Id == subjectId);
-        var faculty = _faculties.FirstOrDefault(f => f.Id == facultyId);
-        var room = _rooms.FirstOrDefault(r => r.Id == roomId);
-        var semester = _semesters.FirstOrDefault(s => s.Id == semesterId);
+        var subject = Subjects.FirstOrDefault(s => s.Id == subjectId);
+        var faculty = Faculties.FirstOrDefault(f => f.Id == facultyId);
+        var room = Rooms.FirstOrDefault(r => r.Id == roomId);
+        var semester = Semesters.FirstOrDefault(s => s.Id == semesterId);
 
         schedule.SubjectId = subjectId;
         schedule.FacultyId = facultyId;
@@ -258,8 +264,8 @@ public class Mutation
 
     public bool DeleteSchedule(int id)
     {
-        var schedule = _schedules.FirstOrDefault(s => s.Id == id);
+        var schedule = Schedules.FirstOrDefault(s => s.Id == id);
         if (schedule == null) return false;
-        return _schedules.Remove(schedule);
+        return Schedules.Remove(schedule);
     }
 }

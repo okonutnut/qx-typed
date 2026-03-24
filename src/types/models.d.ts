@@ -1,6 +1,7 @@
 interface UserModel {
   id: number;
   username: string;
+  password?: string;
   fullName: string;
   role: "admin" | "faculty" | "student";
 }
