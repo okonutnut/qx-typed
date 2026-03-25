@@ -1,13 +1,15 @@
 type PageDefinition = {
   label: string;
   iconName: string;
-  factory?: () => qx.ui.core.Widget;
+  element?: () => qx.ui.core.Widget;
   allowedRoles?: UserRole[];
 };
 
 type SidebarDefinition = {
   label: string;
   iconName?: string;
+  disabled?: boolean;
+  hidden?: boolean;
   children?: SidebarDefinition[];
 };
 
@@ -15,31 +17,61 @@ const PAGE_DEFINITIONS: PageDefinition[] = [
   {
     label: "Subjects",
     iconName: "book-open",
-    factory: () => new SubjectsPage(),
+    element: () => new SubjectsPage(),
     allowedRoles: ["admin", "faculty"],
   },
   {
     label: "Faculty",
     iconName: "users",
-    factory: () => new FacultyPage(),
+    element: () => new FacultyPage(),
     allowedRoles: ["admin", "faculty"],
   },
   {
     label: "Rooms",
     iconName: "door-open",
-    factory: () => new RoomsPage(),
+    element: () => new RoomsPage(),
     allowedRoles: ["admin", "faculty"],
   },
   {
     label: "Semesters",
     iconName: "calendar",
-    factory: () => new SemestersPage(),
+    element: () => new SemestersPage(),
     allowedRoles: ["admin"],
   },
   {
     label: "Class Schedules",
     iconName: "clock",
-    factory: () => new SchedulesPage(),
+    element: () => new SchedulesPage(),
+    allowedRoles: ["admin", "faculty"],
+  },
+  {
+    label: "Level 1",
+    iconName: "circle",
+    element: () => new MockupPage("Level 1"),
+    allowedRoles: ["admin", "faculty"],
+  },
+  {
+    label: "Level 2",
+    iconName: "circle",
+    element: () => new MockupPage("Level 2"),
+    allowedRoles: ["admin", "faculty"],
+  },
+  {
+    label: "Level 3",
+    iconName: "circle",
+    element: () => new MockupPage("Level 3"),
+    allowedRoles: ["admin", "faculty"],
+  },
+  {
+    label: "Level 4",
+    iconName: "circle",
+    element: () => new MockupPage("Level 4"),
+    allowedRoles: ["admin", "faculty"],
+  },
+  {
+    label: "Level 5",
+    iconName: "circle",
+    element: () => new MockupPage("Level 5"),
     allowedRoles: ["admin", "faculty"],
   },
 ];
@@ -83,6 +115,36 @@ const SIDEBAR_DEFINITIONS: SidebarDefinition[] = [
       },
     ],
   },
+  {
+    label: "Nested Demo",
+    iconName: "folder",
+    children: [
+      {
+        label: "Level 1",
+        iconName: "circle",
+      },
+      {
+        label: "Level 2",
+        iconName: "folder",
+        children: [
+          {
+            label: "Level 3",
+            iconName: "circle",
+          },
+          {
+            label: "Level 4",
+            iconName: "folder",
+            children: [
+              {
+                label: "Level 5",
+                iconName: "circle",
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 ];
 
 function createSidebarItems(
@@ -94,6 +156,8 @@ function createSidebarItems(
       icon: definition.iconName
         ? new InlineSvgIcon(definition.iconName, 16)
         : undefined,
+      disabled: definition.disabled,
+      hidden: definition.hidden,
       children: definition.children
         ? createItems(definition.children)
         : undefined,
@@ -111,6 +175,8 @@ function manipulateSidebarItems(
     const normalizedItems: SidebarItem[] = [];
 
     source.forEach((item) => {
+      if (item.hidden) return;
+
       const normalizedLabel = item.label.trim();
       const normalizedChildren = item.children
         ? normalizeItems(item.children)

@@ -473,6 +473,11 @@ class Sidebar extends qx.ui.container.Composite {
   private __applyChromeMode(): void {
     if (this.__drawerMode) {
       this.setPadding(8);
+      this.setDecorator(
+        new qx.ui.decoration.Decorator().set({
+          widthRight: 0,
+        }),
+      );
       this.__schoolLogo.exclude();
       this.__header.exclude();
       this.__appVersion.exclude();
@@ -483,10 +488,18 @@ class Sidebar extends qx.ui.container.Composite {
     }
 
     this.setPadding(10);
+    this.setDecorator(
+      new qx.ui.decoration.Decorator().set({
+        widthRight: 1,
+        styleRight: "solid",
+        colorRight: AppColors.sidebarBorder(),
+      }),
+    );
     this.__schoolLogo.show();
     this.__header.show();
     this.__appVersion.show();
     this.__footer.show();
+    this.__searchInput.show();
     this.__syncBackVisibility();
   }
 

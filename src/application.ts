@@ -7,10 +7,10 @@ function qooxdooMain(app: qx.application.Standalone) {
     const role = globalThis.userRole;
     const pageMap = new Map<string, () => qx.ui.core.Widget>();
     PAGE_DEFINITIONS.forEach((definition) => {
-      if (!definition.factory) return;
+      if (!definition.element) return;
       if (definition.allowedRoles && definition.allowedRoles.indexOf(role) === -1)
         return;
-      pageMap.set(definition.label, definition.factory);
+      pageMap.set(definition.label, definition.element);
     });
 
     const sidebarItems = manipulateSidebarItems(createSidebarItems(), pageMap);
