@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Okonutnut\\Desktop\\Web Projects\\qx-typed\\backend\\Backend.csproj": {}
+    "C:\\Users\\Okonutnut\\Desktop\\Web Projects\\class-scheduler\\backend\\Backend.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Okonutnut\\Desktop\\Web Projects\\qx-typed\\backend\\Backend.csproj": {
+    "C:\\Users\\Okonutnut\\Desktop\\Web Projects\\class-scheduler\\backend\\Backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Okonutnut\\Desktop\\Web Projects\\qx-typed\\backend\\Backend.csproj",
+        "projectUniqueName": "C:\\Users\\Okonutnut\\Desktop\\Web Projects\\class-scheduler\\backend\\Backend.csproj",
         "projectName": "Backend",
-        "projectPath": "C:\\Users\\Okonutnut\\Desktop\\Web Projects\\qx-typed\\backend\\Backend.csproj",
+        "projectPath": "C:\\Users\\Okonutnut\\Desktop\\Web Projects\\class-scheduler\\backend\\Backend.csproj",
         "packagesPath": "C:\\Users\\Okonutnut\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Okonutnut\\Desktop\\Web Projects\\qx-typed\\backend\\obj\\",
+        "outputPath": "C:\\Users\\Okonutnut\\Desktop\\Web Projects\\class-scheduler\\backend\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

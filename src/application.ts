@@ -2,6 +2,12 @@ function qooxdooMain(app: qx.application.Standalone) {
   const root = <qx.ui.container.Composite>app.getRoot();
   type AppLayoutMode = "login" | "main";
 
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js").catch((err) => {
+      console.error("ServiceWorker registration failed:", err);
+    });
+  }
+
   const createMainLayout = () => {
     // Filter pages by the logged-in user's role
     const role = globalThis.userRole;

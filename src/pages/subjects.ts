@@ -121,8 +121,11 @@ class SubjectsPage extends qx.ui.container.Composite {
           : Api.Mutations.createSubject(code, name, units, description);
 
         promise
-          .then(() => this.__loadData())
-          .catch((err: Error) => alert(err.message));
+          .then(() => {
+            BsToast.success(`Subject ${isEdit ? "updated" : "created"} successfully.`);
+            this.__loadData();
+          })
+          .catch((err: Error) => BsToast.error(err.message));
       },
     });
   }
@@ -144,8 +147,11 @@ class SubjectsPage extends qx.ui.container.Composite {
       footerButtons: "ok-cancel",
       onContinue: () => {
         Api.Mutations.deleteSubject(row.id)
-          .then(() => this.__loadData())
-          .catch((err: Error) => alert(err.message));
+          .then(() => {
+            BsToast.success("Subject deleted successfully.");
+            this.__loadData();
+          })
+          .catch((err: Error) => BsToast.error(err.message));
       },
     });
   }

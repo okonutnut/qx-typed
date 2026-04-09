@@ -132,8 +132,11 @@ class FacultyPage extends qx.ui.container.Composite {
           : Api.Mutations.createFaculty(null, employeeId, fullName, department, specialization);
 
         promise
-          .then(() => this.__loadData())
-          .catch((err: Error) => alert(err.message));
+          .then(() => {
+            BsToast.success(`Faculty ${isEdit ? "updated" : "created"} successfully.`);
+            this.__loadData();
+          })
+          .catch((err: Error) => BsToast.error(err.message));
       },
     });
   }
@@ -160,9 +163,10 @@ class FacultyPage extends qx.ui.container.Composite {
         Api.Mutations.deleteFaculty(row.id)
           .then((result) => {
             console.log("[FacultyPage] Delete result:", result);
+            BsToast.success("Faculty deleted successfully.");
             this.__loadData();
           })
-          .catch((err: Error) => alert(err.message));
+          .catch((err: Error) => BsToast.error(err.message));
       },
     });
   }

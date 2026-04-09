@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "bGwmLJvuBFA=",
+  "dgSpecHash": "Mt3vBDOF7js=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Okonutnut\\Desktop\\Web Projects\\qx-typed\\backend\\Backend.csproj",
+  "projectFilePath": "C:\\Users\\Okonutnut\\Desktop\\Web Projects\\class-scheduler\\backend\\Backend.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Okonutnut\\.nuget\\packages\\chillicream.nitro.app\\28.0.7\\chillicream.nitro.app.28.0.7.nupkg.sha512",
     "C:\\Users\\Okonutnut\\.nuget\\packages\\greendonut\\15.1.12\\greendonut.15.1.12.nupkg.sha512",

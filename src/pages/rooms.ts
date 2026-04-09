@@ -100,8 +100,11 @@ class RoomsPage extends qx.ui.container.Composite {
           : Api.Mutations.createRoom(name, building, capacity);
 
         promise
-          .then(() => this.__loadData())
-          .catch((err: Error) => alert(err.message));
+          .then(() => {
+            BsToast.success(`Room ${isEdit ? "updated" : "created"} successfully.`);
+            this.__loadData();
+          })
+          .catch((err: Error) => BsToast.error(err.message));
       },
     });
   }
@@ -123,8 +126,11 @@ class RoomsPage extends qx.ui.container.Composite {
       footerButtons: "ok-cancel",
       onContinue: () => {
         Api.Mutations.deleteRoom(row.id)
-          .then(() => this.__loadData())
-          .catch((err: Error) => alert(err.message));
+          .then(() => {
+            BsToast.success("Room deleted successfully.");
+            this.__loadData();
+          })
+          .catch((err: Error) => BsToast.error(err.message));
       },
     });
   }

@@ -238,7 +238,7 @@ class SchedulesPage extends qx.ui.container.Composite {
         const semId = this.__getSelectedSemesterId();
 
         if (!subject || !faculty || !room || !semId) {
-          alert("All fields are required");
+          BsToast.error("All fields are required");
           return;
         }
 
@@ -251,8 +251,11 @@ class SchedulesPage extends qx.ui.container.Composite {
           : Api.Mutations.createSchedule(subject.id, faculty.id, room.id, semId, dayOfWeek, startTime, endTime);
 
         promise
-          .then(() => this.__loadSchedules())
-          .catch((err: Error) => alert(err.message));
+          .then(() => {
+            BsToast.success(`Schedule ${isEdit ? "updated" : "created"} successfully.`);
+            this.__loadSchedules();
+          })
+          .catch((err: Error) => BsToast.error(err.message));
       },
     });
   }
@@ -274,8 +277,11 @@ class SchedulesPage extends qx.ui.container.Composite {
       footerButtons: "ok-cancel",
       onContinue: () => {
         Api.Mutations.deleteSchedule(row.id)
-          .then(() => this.__loadSchedules())
-          .catch((err: Error) => alert(err.message));
+          .then(() => {
+            BsToast.success("Schedule deleted successfully.");
+            this.__loadSchedules();
+          })
+          .catch((err: Error) => BsToast.error(err.message));
       },
     });
   }

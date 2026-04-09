@@ -116,7 +116,7 @@ class SemestersPage extends qx.ui.container.Composite {
         const name = nameSelect.getSelectedValue();
         const schoolYear = yearInput.getValue().trim();
         if (!name || !schoolYear) {
-          alert("All fields are required");
+          BsToast.error("All fields are required");
           return;
         }
         const promise = isEdit
@@ -124,8 +124,11 @@ class SemestersPage extends qx.ui.container.Composite {
           : Api.Mutations.createSemester(name, schoolYear, 0);
 
         promise
-          .then(() => this.__loadData())
-          .catch((err: Error) => alert(err.message));
+          .then(() => {
+            BsToast.success(`Semester ${isEdit ? "updated" : "created"} successfully.`);
+            this.__loadData();
+          })
+          .catch((err: Error) => BsToast.error(err.message));
       },
     });
   }
@@ -135,8 +138,11 @@ class SemestersPage extends qx.ui.container.Composite {
     if (!row) return;
 
     Api.Mutations.updateSemester(row.id, row.name, row.schoolYear, 1)
-      .then(() => this.__loadData())
-      .catch((err: Error) => alert(err.message));
+      .then(() => {
+        BsToast.success("Semester activated successfully.");
+        this.__loadData();
+      })
+      .catch((err: Error) => BsToast.error(err.message));
   }
 
   private __editSelected(): void {
@@ -156,8 +162,11 @@ class SemestersPage extends qx.ui.container.Composite {
       footerButtons: "ok-cancel",
       onContinue: () => {
         Api.Mutations.deleteSemester(row.id)
-          .then(() => this.__loadData())
-          .catch((err: Error) => alert(err.message));
+          .then(() => {
+            BsToast.success("Semester deleted successfully.");
+            this.__loadData();
+          })
+          .catch((err: Error) => BsToast.error(err.message));
       },
     });
   }
