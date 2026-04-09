@@ -32,6 +32,11 @@
   <!-- Now include your own application code -->
   <script type="text/javascript" src="lib/application.js"></script>
   <div id="toaster" class="toaster"></div>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(err => console.error('SW registration failed:', err));
+    }
+  </script>
 </body>
 
 </html>

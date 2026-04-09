@@ -1,9 +1,11 @@
 using Backend.Types;
+using Backend.Services;
 
 namespace Backend.Mutations;
 
 public class Mutation
 {
+    private static readonly PushService _pushService = new();
     public static readonly List<UserModel> Users = new()
     {
         new() { Id = 1, Username = "admin", Password = "admin123", FullName = "Administrator", Role = "admin" },
@@ -64,6 +66,7 @@ public class Mutation
             Description = description
         };
         Subjects.Add(subject);
+        _ = _pushService.SendNotificationAsync("New Subject", $"Subject '{code} - {name}' has been created.");
         return subject;
     }
 
@@ -76,6 +79,7 @@ public class Mutation
         subject.Name = name;
         subject.Units = units;
         subject.Description = description;
+        _ = _pushService.SendNotificationAsync("Subject Updated", $"Subject '{code} - {name}' has been updated.");
         return subject;
     }
 
@@ -267,5 +271,24 @@ public class Mutation
         var schedule = Schedules.FirstOrDefault(s => s.Id == id);
         if (schedule == null) return false;
         return Schedules.Remove(schedule);
+    }
+
+    public string GetVapidPublicKey() => _pushService.GetVapidPublicKey();
+
+    public bool SubscribePush(string endpoint, string p256dh, string auth)
+    {
+        _pushService.Subscribe(new PushSubscription
+        {
+            Endpoint = endpoint,
+            P256dh = p256dh,
+            Auth = auth
+        });
+        return true;
+    }
+
+    public bool UnsubscribePush(string endpoint)
+    {
+        _pushService.Unsubscribe(endpoint);
+        return true;
     }
 }

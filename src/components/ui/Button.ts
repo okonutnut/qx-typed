@@ -137,4 +137,13 @@ class BsButton extends qx.ui.basic.Atom {
     this.addListener("execute", handler);
     return this;
   }
+
+  public updateIcon(icon: InlineSvgIcon): void {
+    this.__iconHtml = icon.getHtml();
+    this.__renderButton();
+    icon.addListener("changeHtml", () => {
+      this.__iconHtml = icon.getHtml();
+      this.__renderButton();
+    });
+  }
 }

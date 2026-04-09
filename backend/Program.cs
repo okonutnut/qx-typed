@@ -1,8 +1,11 @@
 using Backend.Queries;
 using Backend.Mutations;
 using Backend.Types;
+using Backend.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSingleton<PushService>();
 
 builder.Services.AddCors(options =>
 {

@@ -1,10 +1,13 @@
 using Backend.Types;
 using Backend.Mutations;
+using Backend.Services;
 
 namespace Backend.Queries;
 
 public class Query
 {
+    private static readonly PushService _pushService = new();
+
     public IEnumerable<UserModel> GetUsers()
     {
         return Mutation.Users;
@@ -82,4 +85,6 @@ public class Query
     {
         return GetFacultySubjects().Where(fs => fs.FacultyId == facultyId);
     }
+
+    public string GetVapidPublicKey() => _pushService.GetVapidPublicKey();
 }

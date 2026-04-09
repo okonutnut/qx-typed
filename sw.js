@@ -7,7 +7,30 @@ const CORE = [
   "./manifest.webmanifest",
 ];
 
-// Install: cache the app shell
+self.addEventListener("push", function(event) {
+  const data = event.data ? event.data.json() : {};
+  
+  const title = data.title || "Class Scheduler";
+  const options = {
+    body: data.body || "You have a new notification",
+    icon: data.icon || "/icon.png",
+    badge: data.badge || "/icon.png",
+    data: data.url || "/"
+  };
+  
+  event.waitUntil(
+    self.registration.showNotification(title, options)
+  );
+});
+
+self.addEventListener("notificationclick", function(event) {
+  event.notification.close();
+  
+  event.waitUntil(
+    clients.openWindow(event.notification.data)
+  );
+});
+
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(CORE)));
   self.skipWaiting();

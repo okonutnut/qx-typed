@@ -31,6 +31,8 @@ async function gql<T = any>(
 }
 
 const Queries = {
+  vapidPublicKey: () => gql<{ vapidPublicKey: string }>(`query { vapidPublicKey }`),
+
   users: () => gql<{ users: UserModel[] }>(`query { users { id username password: password fullName: fullName role } }`),
   user: (id: number) => gql<{ user: UserModel | null }>(`query($id: Int!) { user(id: $id) { id username fullName: fullName role } }`, { id }),
 
@@ -99,6 +101,12 @@ const Mutations = {
 
   deleteSchedule: (id: number) =>
     gql<{ deleteSchedule: boolean }>(`mutation($id: Int!) { deleteSchedule(id: $id) }`, { id }),
+
+  subscribePush: (endpoint: string, p256dh: string, auth: string) =>
+    gql<{ subscribePush: boolean }>(`mutation($endpoint: String!, $p256dh: String!, $auth: String!) { subscribePush(endpoint: $endpoint, p256dh: $p256dh, auth: $auth) }`, { endpoint, p256dh, auth }),
+
+  unsubscribePush: (endpoint: string) =>
+    gql<{ unsubscribePush: boolean }>(`mutation($endpoint: String!) { unsubscribePush(endpoint: $endpoint) }`, { endpoint }),
 };
 
 const Api = { Queries, Mutations };

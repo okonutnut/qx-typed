@@ -229,3 +229,6 @@ C:\Users\Okonutnut\Desktop\Web Projects\class-scheduler\backend\obj\Debug\net9.0
 C:\Users\Okonutnut\Desktop\Web Projects\class-scheduler\backend\obj\Debug\net9.0\Backend.pdb
 C:\Users\Okonutnut\Desktop\Web Projects\class-scheduler\backend\obj\Debug\net9.0\Backend.genruntimeconfig.cache
 C:\Users\Okonutnut\Desktop\Web Projects\class-scheduler\backend\obj\Debug\net9.0\ref\Backend.dll
+C:\Users\Okonutnut\Desktop\Web Projects\class-scheduler\backend\bin\Debug\net9.0\Newtonsoft.Json.dll
+C:\Users\Okonutnut\Desktop\Web Projects\class-scheduler\backend\bin\Debug\net9.0\BouncyCastle.Crypto.dll
+C:\Users\Okonutnut\Desktop\Web Projects\class-scheduler\backend\bin\Debug\net9.0\WebPush.dll

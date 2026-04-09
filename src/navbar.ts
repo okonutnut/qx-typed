@@ -7,6 +7,7 @@ class Navbar extends qx.ui.container.Composite {
   private __titleLabel: qx.ui.basic.Label;
   private __actionsPopup: qx.ui.popup.Popup;
   private __isActionsOpen = false;
+  private __notifyBtn!: BsButton;
 
   constructor(pageTitle?: string, onToggleSidebar?: () => void) {
     super(new qx.ui.layout.HBox(2));
@@ -47,6 +48,30 @@ class Navbar extends qx.ui.container.Composite {
 
     const spacer = new qx.ui.core.Spacer();
     this.add(spacer, { flex: 1 });
+
+    // NOTIFICATION BELL
+    this.__notifyBtn = new BsButton(
+      "",
+      new InlineSvgIcon("bell-off", 16),
+      { size: "icon", variant: "ghost", className: "btn-sm p-1" },
+    );
+    this.__notifyBtn.setWidth(50);
+    this.__notifyBtn.onClick(async () => {
+      const isSubscribed = await PushNotifier.isSubscribed();
+      if (isSubscribed) {
+        await PushNotifier.unsubscribe();
+        BsToast.info("Notifications disabled");
+      } else {
+        const success = await PushNotifier.subscribe();
+        if (success) {
+          BsToast.success("Notifications enabled");
+        } else {
+          BsToast.error("Failed to enable notifications");
+        }
+      }
+      this.__updateNotifyButtonState();
+    });
+    this.add(this.__notifyBtn);
 
     // OTHER ACTIONS
     const otherActionsBtn = new BsButton(
@@ -163,5 +188,17 @@ class Navbar extends qx.ui.container.Composite {
 
   public setTitle(value: string): void {
     this.setPageTitle(value);
+  }
+
+  public initNotifyState(): void {
+    this.__updateNotifyButtonState();
+  }
+
+  private __updateNotifyButtonState(): void {
+    if (!this.__notifyBtn) return;
+
+    PushNotifier.isSubscribed().then((isSubscribed) => {
+      this.__notifyBtn.updateIcon(new InlineSvgIcon(isSubscribed ? "bell" : "bell-off", 16));
+    });
   }
 }

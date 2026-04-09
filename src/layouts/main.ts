@@ -109,6 +109,7 @@ class MainLayout extends qx.ui.container.Composite {
         sidebar.setCollapsed(isSidebarCollapsed);
       }
     });
+    navbar.initNotifyState();
     contentContainer.add(mobileTopBar);
     contentContainer.add(navbar);
 
