@@ -1,3 +1,5 @@
+const DAYS_OF_WEEK = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
 /**
  * Schedules management page — CRUD with conflict detection.
  */
@@ -59,7 +61,17 @@ class SchedulesPage extends qx.ui.container.Composite {
           minWidth: 170,
           valueGetter: (params: any) => `${params.data.roomName} (${params.data.building})`,
         },
-        { headerName: "Day", field: "dayOfWeek", width: 90 },
+        {
+          headerName: "Day",
+          width: 140,
+          valueGetter: (params: any) => {
+            const days = params.data.dayOfWeek;
+            if (!days) return "";
+            if (typeof days === "string") return days;
+            if (Array.isArray(days)) return days.join(", ");
+            return "";
+          },
+        },
         { headerName: "Start", field: "startTime", width: 95 },
         { headerName: "End", field: "endTime", width: 95 },
       ],
@@ -154,6 +166,16 @@ class SchedulesPage extends qx.ui.container.Composite {
     return this.__table.getSelectedRow();
   }
 
+  private __renderDayCheckboxes(selectedDays: string[]): string {
+    return DAYS_OF_WEEK.map((day) => {
+      const checked = selectedDays.indexOf(day) !== -1 ? "checked" : "";
+      return `<label class="inline-flex items-center mr-4 cursor-pointer">
+        <input type="checkbox" name="dayOfWeek" value="${day}" ${checked} class="w-4 h-4 text-primary bg-background border-border rounded focus:ring-primary">
+        <span class="ml-2 text-sm">${day}</span>
+      </label>`;
+    }).join("");
+  }
+
   private __showFormDialog(schedule?: ScheduleModel): void {
     const isEdit = !!schedule;
     const form = new qx.ui.container.Composite(new qx.ui.layout.VBox(6));
@@ -189,17 +211,22 @@ class SchedulesPage extends qx.ui.container.Composite {
       );
     }
 
-    const daySelect = new BsSelect(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]);
-    daySelect.setAllowGrowX(true);
-    if (schedule) daySelect.setSelectedByLabel(schedule.dayOfWeek);
+    const initialDays = schedule?.dayOfWeek
+      ? Array.isArray(schedule.dayOfWeek)
+        ? schedule.dayOfWeek
+        : [schedule.dayOfWeek]
+      : [];
+    const dayCheckboxes = new qx.ui.embed.Html(this.__renderDayCheckboxes(initialDays));
+    dayCheckboxes.setAllowGrowX(true);
 
-    const startInput = new BsInput(
-      schedule?.startTime ?? "",
-      "Start Time (HH:MM)",
+    const startTimeInput = new qx.ui.embed.Html(
+      `<input type="time" class="input bg-card text-foreground border-border w-full p-2 rounded-md" value="${schedule?.startTime ?? ""}">`
     );
-    startInput.setAllowGrowX(true);
-    const endInput = new BsInput(schedule?.endTime ?? "", "End Time (HH:MM)");
-    endInput.setAllowGrowX(true);
+    startTimeInput.setAllowGrowX(true);
+    const endTimeInput = new qx.ui.embed.Html(
+      `<input type="time" class="input bg-card text-foreground border-border w-full p-2 rounded-md" value="${schedule?.endTime ?? ""}">`
+    );
+    endTimeInput.setAllowGrowX(true);
 
     form.add(new qx.ui.basic.Label("Subject"));
     form.add(subjectSelect);
@@ -207,12 +234,12 @@ class SchedulesPage extends qx.ui.container.Composite {
     form.add(facultySelect);
     form.add(new qx.ui.basic.Label("Room"));
     form.add(roomSelect);
-    form.add(new qx.ui.basic.Label("Day"));
-    form.add(daySelect);
+    form.add(new qx.ui.basic.Label("Days"));
+    form.add(dayCheckboxes);
     form.add(new qx.ui.basic.Label("Start Time"));
-    form.add(startInput);
+    form.add(startTimeInput);
     form.add(new qx.ui.basic.Label("End Time"));
-    form.add(endInput);
+    form.add(endTimeInput);
 
     BsAlertDialog.show({
       title: isEdit ? "Edit Schedule" : "Add Schedule",
@@ -239,9 +266,25 @@ class SchedulesPage extends qx.ui.container.Composite {
           return;
         }
 
-        const dayOfWeek = daySelect.getSelectedValue();
-        const startTime = startInput.getValue().trim();
-        const endTime = endInput.getValue().trim();
+        const dayCheckboxContainer = dayCheckboxes.getContentElement().getDomElement();
+        const selectedDays: string[] = [];
+        if (dayCheckboxContainer) {
+          const checkboxes = dayCheckboxContainer.querySelectorAll('input[type="checkbox"]:checked');
+          checkboxes.forEach((cb) => {
+            selectedDays.push((cb as HTMLInputElement).value);
+          });
+        }
+
+        if (selectedDays.length === 0) {
+          BsToast.error("Please select at least one day");
+          return;
+        }
+
+        const dayOfWeek = selectedDays;
+        const startEl = startTimeInput.getContentElement().getDomElement()?.querySelector("input");
+        const endEl = endTimeInput.getContentElement().getDomElement()?.querySelector("input");
+        const startTime = (startEl as HTMLInputElement)?.value ?? "";
+        const endTime = (endEl as HTMLInputElement)?.value ?? "";
 
         const promise = isEdit
           ? Api.Mutations.updateSchedule(schedule!.id, subject.id, faculty.id, room.id, semId, dayOfWeek, startTime, endTime)
@@ -269,7 +312,9 @@ class SchedulesPage extends qx.ui.container.Composite {
 
     BsAlertDialog.show({
       title: "Delete Schedule",
-      description: `Delete ${row.subjectCode} — ${row.facultyName} on ${row.dayOfWeek} ${row.startTime}-${row.endTime}?`,
+      description: `Delete ${row.subjectCode} — ${row.facultyName} on ${
+      Array.isArray(row.dayOfWeek) ? row.dayOfWeek.join(", ") : row.dayOfWeek
+    } ${row.startTime}-${row.endTime}?`,
       continueLabel: "Delete",
       footerButtons: "ok-cancel",
       onContinue: () => {

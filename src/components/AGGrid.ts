@@ -94,6 +94,7 @@ class AGGrid<T> extends qx.ui.container.Composite {
       rowData: this.__rows,
       rowSelection: "single",
       animateRows: true,
+      theme: "legacy",
       defaultColDef: {
         sortable: true,
         resizable: true,

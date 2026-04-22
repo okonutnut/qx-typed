@@ -91,11 +91,11 @@ const Queries = {
 
   schedules: () =>
     gql<{ schedules: ScheduleModel[] }>(
-      `query { schedules { id subjectId: subjectId facultyId: facultyId roomId: roomId semesterId: semesterId dayOfWeek: dayOfWeek startTime: startTime endTime: endTime subjectCode: subjectCode subjectName: subjectName facultyName: facultyName employeeId: employeeId roomName: roomName building semesterName: semesterName schoolYear: schoolYear } }`,
+      `query { schedules { id subjectId: subjectId facultyId: facultyId roomId: roomId semesterId: semesterId dayOfWeek: days startTime: startTime endTime: endTime subjectCode: subjectCode subjectName: subjectName facultyName: facultyName employeeId: employeeId roomName: roomName building semesterName: semesterName schoolYear: schoolYear } }`,
     ),
   schedule: (id: number) =>
     gql<{ schedule: ScheduleModel | null }>(
-      `query($id: Int!) { schedule(id: $id) { id subjectId: subjectId facultyId: facultyId roomId: roomId semesterId: semesterId dayOfWeek: dayOfWeek startTime: startTime endTime: endTime subjectCode: subjectCode subjectName: subjectName facultyName: facultyName employeeId: employeeId roomName: roomName building semesterName: semesterName schoolYear: schoolYear } }`,
+      `query($id: Int!) { schedule(id: $id) { id subjectId: subjectId facultyId: facultyId roomId: roomId semesterId: semesterId dayOfWeek: days startTime: startTime endTime: endTime subjectCode: subjectCode subjectName: subjectName facultyName: facultyName employeeId: employeeId roomName: roomName building semesterName: semesterName schoolYear: schoolYear } }`,
       { id },
     ),
 
@@ -217,18 +217,18 @@ const Mutations = {
     facultyId: number,
     roomId: number,
     semesterId: number,
-    dayOfWeek: string,
+    dayOfWeek: string[],
     startTime: string,
     endTime: string,
   ) =>
     gql<{ createSchedule: ScheduleModel }>(
-      `mutation($subjectId: Int!, $facultyId: Int!, $roomId: Int!, $semesterId: Int!, $dayOfWeek: String!, $startTime: String!, $endTime: String!) { createSchedule(subjectId: $subjectId, facultyId: $facultyId, roomId: $roomId, semesterId: $semesterId, dayOfWeek: $dayOfWeek, startTime: $startTime, endTime: $endTime) { id subjectId: subjectId facultyId: facultyId roomId: roomId semesterId: semesterId dayOfWeek: dayOfWeek startTime: startTime endTime: endTime subjectCode: subjectCode subjectName: subjectName facultyName: facultyName employeeId: employeeId roomName: roomName building semesterName: semesterName schoolYear: schoolYear } }`,
+      `mutation($subjectId: Int!, $facultyId: Int!, $roomId: Int!, $semesterId: Int!, $days: [String!]!, $startTime: String!, $endTime: String!) { createSchedule(subjectId: $subjectId, facultyId: $facultyId, roomId: $roomId, semesterId: $semesterId, days: $days, startTime: $startTime, endTime: $endTime) { id subjectId: subjectId facultyId: facultyId roomId: roomId semesterId: semesterId dayOfWeek: days startTime: startTime endTime: endTime subjectCode: subjectCode subjectName: subjectName facultyName: facultyName employeeId: employeeId roomName: roomName building semesterName: semesterName schoolYear: schoolYear } }`,
       {
         subjectId,
         facultyId,
         roomId,
         semesterId,
-        dayOfWeek,
+        days: dayOfWeek,
         startTime,
         endTime,
       },
@@ -240,19 +240,19 @@ const Mutations = {
     facultyId: number,
     roomId: number,
     semesterId: number,
-    dayOfWeek: string,
+    dayOfWeek: string[],
     startTime: string,
     endTime: string,
   ) =>
     gql<{ updateSchedule: ScheduleModel | null }>(
-      `mutation($id: Int!, $subjectId: Int!, $facultyId: Int!, $roomId: Int!, $semesterId: Int!, $dayOfWeek: String!, $startTime: String!, $endTime: String!) { updateSchedule(id: $id, subjectId: $subjectId, facultyId: $facultyId, roomId: $roomId, semesterId: $semesterId, dayOfWeek: $dayOfWeek, startTime: $startTime, endTime: $endTime) { id subjectId: subjectId facultyId: facultyId roomId: roomId semesterId: semesterId dayOfWeek: dayOfWeek startTime: startTime endTime: endTime subjectCode: subjectCode subjectName: subjectName facultyName: facultyName employeeId: employeeId roomName: roomName building semesterName: semesterName schoolYear: schoolYear } }`,
+      `mutation($id: Int!, $subjectId: Int!, $facultyId: Int!, $roomId: Int!, $semesterId: Int!, $days: [String!]!, $startTime: String!, $endTime: String!) { updateSchedule(id: $id, subjectId: $subjectId, facultyId: $facultyId, roomId: $roomId, semesterId: $semesterId, days: $days, startTime: $startTime, endTime: $endTime) { id subjectId: subjectId facultyId: facultyId roomId: roomId semesterId: semesterId dayOfWeek: days startTime: startTime endTime: endTime subjectCode: subjectCode subjectName: subjectName facultyName: facultyName employeeId: employeeId roomName: roomName building semesterName: semesterName schoolYear: schoolYear } }`,
       {
         id,
         subjectId,
         facultyId,
         roomId,
         semesterId,
-        dayOfWeek,
+        days: dayOfWeek,
         startTime,
         endTime,
       },

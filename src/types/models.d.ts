@@ -52,7 +52,7 @@ interface ScheduleModel {
   facultyId: number;
   roomId: number;
   semesterId: number;
-  dayOfWeek: string;
+  dayOfWeek: string[];
   startTime: string;
   endTime: string;
   subjectCode: string;
