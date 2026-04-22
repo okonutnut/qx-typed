@@ -24,11 +24,10 @@ class Navbar extends qx.ui.container.Composite {
     );
 
     // SIDEBAR TRIGGER
-    const collapseSidebarBtn = new BsButton(
-      "",
-      new InlineSvgIcon("menu", 16),
-      { size: "icon", variant: "ghost", className: "btn-sm p-1" },
-    );
+    const collapseSidebarBtn = new BsButton("", new InlineSvgIcon("menu", 16), {
+      size: "icon",
+      variant: "ghost",
+    });
     collapseSidebarBtn.setMinWidth(50);
     collapseSidebarBtn.setAllowGrowX(true);
     collapseSidebarBtn.onClick(() => {
@@ -51,11 +50,10 @@ class Navbar extends qx.ui.container.Composite {
     this.add(spacer, { flex: 1 });
 
     // NOTIFICATION BELL
-    this.__notifyBtn = new BsButton(
-      "",
-      new InlineSvgIcon("bell-off", 16),
-      { size: "icon", variant: "ghost", className: "btn-sm p-1" },
-    );
+    this.__notifyBtn = new BsButton("", new InlineSvgIcon("bell-off", 16), {
+      size: "icon",
+      variant: "ghost",
+    });
     this.__notifyBtn.setMinWidth(50);
     this.__notifyBtn.setAllowGrowX(true);
     this.__notifyBtn.onClick(async () => {
@@ -76,11 +74,10 @@ class Navbar extends qx.ui.container.Composite {
     this.add(this.__notifyBtn);
 
     // OTHER ACTIONS
-    const otherActionsBtn = new BsButton(
-      "",
-      new InlineSvgIcon("ellipsis", 8),
-      { size: "icon", variant: "ghost", className: "btn-sm p-1" },
-    );
+    const otherActionsBtn = new BsButton("", new InlineSvgIcon("ellipsis", 8), {
+      size: "icon",
+      variant: "ghost",
+    });
     otherActionsBtn.setMinWidth(50);
     otherActionsBtn.setAllowGrowX(true);
     otherActionsBtn.onClick(() => this.__toggleActionsPopup(otherActionsBtn));
@@ -201,7 +198,9 @@ class Navbar extends qx.ui.container.Composite {
     if (!this.__notifyBtn) return;
 
     PushNotifier.isSubscribed().then((isSubscribed) => {
-      this.__notifyBtn.updateIcon(new InlineSvgIcon(isSubscribed ? "bell" : "bell-off", 16));
+      this.__notifyBtn.updateIcon(
+        new InlineSvgIcon(isSubscribed ? "bell" : "bell-off", 16),
+      );
     });
   }
 }
