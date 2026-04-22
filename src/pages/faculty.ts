@@ -2,7 +2,7 @@
  * Faculty management page — CRUD for faculty members + subject assignments.
  */
 class FacultyPage extends qx.ui.container.Composite {
-  private __table!: Table<FacultyModel>;
+  private __table!: AGGrid<FacultyModel>;
 
   constructor() {
     super(new qx.ui.layout.VBox(10));
@@ -27,27 +27,24 @@ class FacultyPage extends qx.ui.container.Composite {
     toolbar.add(refreshBtn);
     this.add(toolbar);
 
-    this.__table = new Table<FacultyModel>(
+    this.__table = new AGGrid<FacultyModel>(
       [
         { headerName: "ID", field: "id", hide: true },
         {
           headerName: "Employee ID",
           field: "employeeId",
           minWidth: 140,
-          flex: 0,
         },
-        { headerName: "Full Name", field: "fullName", minWidth: 220, flex: 1.2 },
-        { headerName: "Department", field: "department", minWidth: 180, flex: 1 },
+        { headerName: "Full Name", field: "fullName", minWidth: 220 },
+        { headerName: "Department", field: "department", minWidth: 180 },
         {
           headerName: "Specialization",
           field: "specialization",
           minWidth: 220,
-          flex: 1.2,
         },
       ],
       {
         emptyMessage: "No faculty records found.",
-        rowId: (row) => String(row.id),
       },
     );
     this.add(this.__table, { flex: 1 });

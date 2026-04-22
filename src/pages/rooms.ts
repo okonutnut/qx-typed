@@ -2,7 +2,7 @@
  * Rooms management page — CRUD for rooms.
  */
 class RoomsPage extends qx.ui.container.Composite {
-  private __table!: Table<RoomModel>;
+  private __table!: AGGrid<RoomModel>;
 
   constructor() {
     super(new qx.ui.layout.VBox(10));
@@ -27,14 +27,14 @@ class RoomsPage extends qx.ui.container.Composite {
     toolbar.add(refreshBtn);
     this.add(toolbar);
 
-    this.__table = new Table<RoomModel>(
+    this.__table = new AGGrid<RoomModel>(
       [
         { headerName: "ID", field: "id", hide: true },
-        { headerName: "Name", field: "name", minWidth: 140, flex: 1 },
-        { headerName: "Building", field: "building", minWidth: 160, flex: 1 },
-        { headerName: "Capacity", field: "capacity", minWidth: 110, flex: 0 },
+        { headerName: "Name", field: "name", minWidth: 140 },
+        { headerName: "Building", field: "building", minWidth: 160 },
+        { headerName: "Capacity", field: "capacity", width: 110 },
       ],
-      { emptyMessage: "No rooms available.", rowId: (row) => String(row.id) },
+      { emptyMessage: "No rooms available." },
     );
     this.add(this.__table, { flex: 1 });
 

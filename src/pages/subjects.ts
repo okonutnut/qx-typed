@@ -2,7 +2,7 @@
  * Subjects management page — CRUD for academic subjects.
  */
 class SubjectsPage extends qx.ui.container.Composite {
-  private __table!: Table<SubjectModel>;
+  private __table!: AGGrid<SubjectModel>;
 
   constructor() {
     super(new qx.ui.layout.VBox(10));
@@ -27,20 +27,19 @@ class SubjectsPage extends qx.ui.container.Composite {
     toolbar.add(refreshBtn);
     this.add(toolbar);
 
-    this.__table = new Table<SubjectModel>(
+    this.__table = new AGGrid<SubjectModel>(
       [
         { headerName: "ID", field: "id", hide: true },
-        { headerName: "Code", field: "code", minWidth: 120, flex: 0 },
-        { headerName: "Name", field: "name", minWidth: 220, flex: 1.3 },
-        { headerName: "Units", field: "units", minWidth: 90, flex: 0 },
+        { headerName: "Code", field: "code", width: 120 },
+        { headerName: "Name", field: "name", minWidth: 220 },
+        { headerName: "Units", field: "units", width: 90 },
         {
           headerName: "Description",
           field: "description",
           minWidth: 260,
-          flex: 1.8,
         },
       ],
-      { emptyMessage: "No subjects available.", rowId: (row) => String(row.id) },
+      { emptyMessage: "No subjects available." },
     );
     this.add(this.__table, { flex: 1 });
 

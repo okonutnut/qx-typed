@@ -2,7 +2,7 @@
  * Semesters management page — CRUD + set active semester.
  */
 class SemestersPage extends qx.ui.container.Composite {
-  private __table!: Table<SemesterModel>;
+  private __table!: AGGrid<SemesterModel>;
 
   constructor() {
     super(new qx.ui.layout.VBox(10));
@@ -27,27 +27,24 @@ class SemestersPage extends qx.ui.container.Composite {
     toolbar.add(refreshBtn);
     this.add(toolbar);
 
-    this.__table = new Table<SemesterModel>(
+    this.__table = new AGGrid<SemesterModel>(
       [
         { headerName: "ID", field: "id", hide: true },
-        { headerName: "Name", field: "name", minWidth: 180, flex: 1 },
+        { headerName: "Name", field: "name", minWidth: 180 },
         {
           headerName: "School Year",
           field: "schoolYear",
           minWidth: 160,
-          flex: 1,
         },
         {
           headerName: "Status",
           field: "isActive",
-          minWidth: 120,
-          flex: 0,
-          valueFormatter: (value) => (value ? "Active" : "Inactive"),
+          width: 120,
+          valueFormatter: (params: any) => params.value ? "Active" : "Inactive",
         },
       ],
       {
         emptyMessage: "No semesters configured.",
-        rowId: (row) => String(row.id),
       },
     );
     this.add(this.__table, { flex: 1 });

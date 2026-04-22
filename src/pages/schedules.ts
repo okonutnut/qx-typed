@@ -2,7 +2,7 @@
  * Schedules management page — CRUD with conflict detection.
  */
 class SchedulesPage extends qx.ui.container.Composite {
-  private __table!: Table<ScheduleModel>;
+  private __table!: AGGrid<ScheduleModel>;
   private __semesters: SemesterModel[] = [];
   private __faculty: FacultyModel[] = [];
   private __subjects: SubjectModel[] = [];
@@ -45,29 +45,26 @@ class SchedulesPage extends qx.ui.container.Composite {
     toolbar.add(refreshBtn);
     this.add(toolbar);
 
-    this.__table = new Table<ScheduleModel>(
+    this.__table = new AGGrid<ScheduleModel>(
       [
         { headerName: "ID", field: "id", hide: true },
         {
           headerName: "Subject",
           minWidth: 230,
-          flex: 1.3,
-          valueGetter: (row) => `${row.subjectCode} — ${row.subjectName}`,
+          valueGetter: (params: any) => `${params.data.subjectCode} — ${params.data.subjectName}`,
         },
-        { headerName: "Faculty", field: "facultyName", minWidth: 210, flex: 1.2 },
+        { headerName: "Faculty", field: "facultyName", minWidth: 210 },
         {
           headerName: "Room",
           minWidth: 170,
-          flex: 1,
-          valueGetter: (row) => `${row.roomName} (${row.building})`,
+          valueGetter: (params: any) => `${params.data.roomName} (${params.data.building})`,
         },
-        { headerName: "Day", field: "dayOfWeek", minWidth: 90, flex: 0 },
-        { headerName: "Start", field: "startTime", minWidth: 95, flex: 0 },
-        { headerName: "End", field: "endTime", minWidth: 95, flex: 0 },
+        { headerName: "Day", field: "dayOfWeek", width: 90 },
+        { headerName: "Start", field: "startTime", width: 95 },
+        { headerName: "End", field: "endTime", width: 95 },
       ],
       {
         emptyMessage: "No schedules found for the selected semester.",
-        rowId: (row) => String(row.id),
       },
     );
     this.add(this.__table, { flex: 1 });
