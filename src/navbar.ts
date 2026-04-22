@@ -28,8 +28,9 @@ class Navbar extends qx.ui.container.Composite {
       size: "icon",
       variant: "ghost",
     });
-    collapseSidebarBtn.setMinWidth(50);
+    collapseSidebarBtn.setWidth(50);
     collapseSidebarBtn.setAllowGrowX(true);
+    collapseSidebarBtn.setAllowGrowY(false);
     collapseSidebarBtn.onClick(() => {
       this.fireEvent("toggleSidebar");
       if (onToggleSidebar) onToggleSidebar();
@@ -54,7 +55,7 @@ class Navbar extends qx.ui.container.Composite {
       size: "icon",
       variant: "ghost",
     });
-    this.__notifyBtn.setMinWidth(50);
+    this.__notifyBtn.setWidth(50);
     this.__notifyBtn.setAllowGrowX(true);
     this.__notifyBtn.onClick(async () => {
       const isSubscribed = await PushNotifier.isSubscribed();
@@ -78,7 +79,7 @@ class Navbar extends qx.ui.container.Composite {
       size: "icon",
       variant: "ghost",
     });
-    otherActionsBtn.setMinWidth(50);
+    otherActionsBtn.setWidth(50);
     otherActionsBtn.setAllowGrowX(true);
     otherActionsBtn.onClick(() => this.__toggleActionsPopup(otherActionsBtn));
     this.add(otherActionsBtn);
