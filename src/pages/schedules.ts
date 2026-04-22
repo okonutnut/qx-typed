@@ -2,7 +2,7 @@
  * Schedules management page — CRUD with conflict detection.
  */
 class SchedulesPage extends qx.ui.container.Composite {
-  private __table!: TableWidget<ScheduleModel>;
+  private __table!: Table<ScheduleModel>;
   private __semesters: SemesterModel[] = [];
   private __faculty: FacultyModel[] = [];
   private __subjects: SubjectModel[] = [];
@@ -45,7 +45,7 @@ class SchedulesPage extends qx.ui.container.Composite {
     toolbar.add(refreshBtn);
     this.add(toolbar);
 
-    this.__table = new TableWidget<ScheduleModel>(
+    this.__table = new Table<ScheduleModel>(
       [
         { headerName: "ID", field: "id", hide: true },
         {

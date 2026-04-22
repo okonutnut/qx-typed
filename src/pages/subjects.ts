@@ -2,7 +2,7 @@
  * Subjects management page — CRUD for academic subjects.
  */
 class SubjectsPage extends qx.ui.container.Composite {
-  private __table!: TableWidget<SubjectModel>;
+  private __table!: Table<SubjectModel>;
 
   constructor() {
     super(new qx.ui.layout.VBox(10));
@@ -27,7 +27,7 @@ class SubjectsPage extends qx.ui.container.Composite {
     toolbar.add(refreshBtn);
     this.add(toolbar);
 
-    this.__table = new TableWidget<SubjectModel>(
+    this.__table = new Table<SubjectModel>(
       [
         { headerName: "ID", field: "id", hide: true },
         { headerName: "Code", field: "code", minWidth: 120, flex: 0 },

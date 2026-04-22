@@ -16,7 +16,7 @@ type TableOptions = {
   pageSize?: number;
 };
 
-class TableWidget<T> extends qx.ui.container.Composite {
+class Table<T> extends qx.ui.container.Composite {
   private __columns: TableColumn[];
   private __rows: T[] = [];
   private __filteredRows: T[] = [];
@@ -31,8 +31,6 @@ class TableWidget<T> extends qx.ui.container.Composite {
   private __totalPages: number = 1;
   private __tableContainer!: qx.ui.embed.Html;
   private __tableBody!: HTMLElement;
-  private __offcanvas!: BsOffcanvas;
-  private __offcanvasContent!: qx.ui.container.Composite;
 
   constructor(columns: TableColumn[], options?: TableOptions) {
     super(new qx.ui.layout.VBox(0));
@@ -43,129 +41,46 @@ class TableWidget<T> extends qx.ui.container.Composite {
 
     this.setLayout(new qx.ui.layout.VBox(0));
 
-    this.__buildToolbar();
+    this.__buildHeader();
     this.__buildTableContainer();
     this.__buildPagination();
-    this.__buildOffcanvas();
   }
 
-  private __buildToolbar(): void {
-    const toolbar = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
-    toolbar.setMarginBottom(8);
+  private __buildHeader(): void {
+    const headerContainer = new qx.ui.container.Composite(new qx.ui.layout.VBox(4));
+    headerContainer.setMarginBottom(8);
 
-    const filterBtn = new BsButton(
-      "Filters",
-      new InlineSvgIcon("filter", 16),
-      { size: "sm", variant: "outline" },
-    );
-    filterBtn.onClick(() => this.__offcanvas.toggle());
-    toolbar.add(filterBtn);
+    const searchRow = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
+    searchRow.setMarginBottom(4);
 
-    const searchContainer = new qx.ui.container.Composite(new qx.ui.layout.HBox(4));
-    searchContainer.setAllowGrowX(true);
+    const searchIcon = new InlineSvgIcon("search", 16);
+    searchRow.add(searchIcon);
 
-    this.__searchInput = new BsInput("", "Search...");
-    this.__searchInput.setAllowGrowX(true);
+    this.__searchInput = new BsInput("", "Search all columns...");
+    this.__searchInput.setWidth(300);
     this.__searchInput.onInput(() => this.__applyFilters());
-    searchContainer.add(this.__searchInput);
+    searchRow.add(this.__searchInput);
 
-    toolbar.add(searchContainer, { flex: 1 });
+    headerContainer.add(searchRow);
 
-    this.add(toolbar);
-  }
+    const filterRow = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
+    filterRow.setMarginBottom(4);
 
-  private __buildOffcanvas(): void {
-    this.__offcanvasContent = new qx.ui.container.Composite(new qx.ui.layout.VBox(10));
-    this.__offcanvasContent.setPadding(16);
-
-    const header = new qx.ui.container.Composite(new qx.ui.layout.HBox());
-    header.setMarginBottom(8);
-
-    const title = new qx.ui.basic.Label("Filters & Search").set({
-      font: new qx.bom.Font("16", ["Inter", "sans-serif"]).set({ bold: true }),
-    });
-    header.add(title);
-    header.add(new qx.ui.core.Spacer(), { flex: 1 });
-
-    const closeBtn = new BsButton(
-      "",
-      new InlineSvgIcon("x", 18),
-      { size: "sm", variant: "ghost" },
-    );
-    closeBtn.onClick(() => this.__offcanvas.close());
-    header.add(closeBtn);
-
-    this.__offcanvasContent.add(header);
-
-    const searchSection = new qx.ui.container.Composite(new qx.ui.layout.VBox(4));
-    const searchLabel = new qx.ui.basic.Label("Global Search").set({
-      font: new qx.bom.Font("14", ["Inter", "sans-serif"]).set({ bold: true }),
-    });
-    searchSection.add(searchLabel);
-
-    const searchInput = new BsInput(this.__searchInput.getValue(), "Search all columns...");
-    searchInput.setAllowGrowX(true);
-    searchInput.onInput(() => {
-      this.__searchInput.setValue(searchInput.getValue());
-      this.__applyFilters();
-    });
-    searchSection.add(searchInput);
-    this.__offcanvasContent.add(searchSection);
-
-    const filtersSection = new qx.ui.container.Composite(new qx.ui.layout.VBox(6));
-    const filtersLabel = new qx.ui.basic.Label("Column Filters").set({
-      font: new qx.bom.Font("14", ["Inter", "sans-serif"]).set({ bold: true }),
-    });
-    filtersSection.add(filtersLabel);
+    const filterIcon = new InlineSvgIcon("filter", 16);
+    filterRow.add(filterIcon);
 
     this.__columns.forEach((col, idx) => {
       if (!col.hide && col.filterable !== false) {
-        const filterRow = new qx.ui.container.Composite(new qx.ui.layout.VBox(2));
-        const label = new qx.ui.basic.Label(col.headerName);
-        label.setTextColor(AppColors.mutedForeground());
-
-        const filterInput = new BsInput("", `Filter by ${col.headerName}...`);
-        filterInput.setAllowGrowX(true);
+        const filterInput = new BsInput("", `Filter ${col.headerName}...`);
+        filterInput.setWidth(150);
         filterInput.onInput(() => this.__applyFilters());
-
         this.__filterInputs.set(idx, filterInput);
-
-        filterRow.add(label);
         filterRow.add(filterInput);
-        filtersSection.add(filterRow);
       }
     });
 
-    this.__offcanvasContent.add(filtersSection);
-
-    const actionsRow = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
-    actionsRow.setMarginTop(8);
-
-    const clearBtn = new BsButton(
-      "Clear All",
-      new InlineSvgIcon("x-circle", 16),
-      { size: "sm", variant: "outline" },
-    );
-    clearBtn.onClick(() => {
-      this.__searchInput.setValue("");
-      this.__filterInputs.forEach((input) => input.setValue(""));
-      this.__applyFilters();
-    });
-    actionsRow.add(clearBtn);
-
-    actionsRow.add(new qx.ui.core.Spacer(), { flex: 1 });
-
-    const applyBtn = new BsButton(
-      "Apply",
-      new InlineSvgIcon("check", 16),
-      { size: "sm", variant: "default" },
-    );
-    applyBtn.onClick(() => this.__offcanvas.close());
-    actionsRow.add(applyBtn);
-
-    this.__offcanvasContent.add(actionsRow);
-
-    this.__offcanvas = new BsOffcanvas(this.__offcanvasContent, "end");
+    headerContainer.add(filterRow);
+    this.add(headerContainer);
   }
 
   private __buildTableContainer(): void {
@@ -326,11 +241,9 @@ class TableWidget<T> extends qx.ui.container.Composite {
     const endIdx = Math.min(startIdx + this.__pageSize, this.__filteredRows.length);
     const pageRows = this.__filteredRows.slice(startIdx, endIdx);
 
-    if (!this.__tableBody) {
-      const elem = (this.__tableContainer as any).getContentElement().getDomElement();
-      if (elem) {
-        this.__tableBody = elem.querySelector(".table-body") as HTMLElement;
-      }
+    const elem = (this.__tableContainer as any).getContentElement()?.getDomElement();
+    if (elem) {
+      this.__tableBody = elem.querySelector(".table-body") as HTMLElement;
     }
 
     if (!this.__tableBody) return;
@@ -391,7 +304,7 @@ class TableWidget<T> extends qx.ui.container.Composite {
     this.__rows = rows.slice();
     this.__filteredRows = rows.slice();
     this.__currentPage = 1;
-    this.__applyFilters();
+    this.__updateTable();
   }
 
   getSelectedRow(): T | null {
