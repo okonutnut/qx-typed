@@ -11,6 +11,7 @@ class BsInputGroup extends qx.ui.container.Composite {
   ) {
     super(new qx.ui.layout.VBox(3));
     this.setAllowGrowX(true);
+    this.setAllowGrowY(true);
 
     this.__label = new qx.ui.basic.Label(labelText);
 

@@ -14,6 +14,7 @@ class BsSelect extends qx.ui.basic.Atom {
 
     this._setLayout(new qx.ui.layout.Grow());
     this.setAllowGrowX(true);
+    this.setAllowGrowY(true);
     this.setFocusable(true);
 
     this.__options = options;
@@ -21,6 +22,8 @@ class BsSelect extends qx.ui.basic.Atom {
 
     this.__htmlSelect = new qx.ui.embed.Html("");
     this.__htmlSelect.setAllowGrowX(true);
+    this.__htmlSelect.setAllowGrowY(true);
+    this.__htmlSelect.setOverflowY("visible");
 
     this.__render();
     this._add(this.__htmlSelect);

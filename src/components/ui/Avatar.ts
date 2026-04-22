@@ -21,6 +21,8 @@ class BsAvatar extends qx.ui.basic.Atom {
     super();
 
     this._setLayout(new qx.ui.layout.Grow());
+    this.setAllowGrowX(true);
+    this.setAllowGrowY(true);
 
     this.__src = src ?? "";
     this.__alt = alt ?? "User avatar";
@@ -29,6 +31,8 @@ class BsAvatar extends qx.ui.basic.Atom {
     this.__shape = shape;
 
     this.__htmlAvatar = new qx.ui.embed.Html("");
+    this.__htmlAvatar.setAllowGrowY(true);
+    this.__htmlAvatar.setOverflowY("visible");
     this.__render();
     this._add(this.__htmlAvatar);
 

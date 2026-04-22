@@ -21,6 +21,7 @@ class BsTextarea extends qx.ui.basic.Atom {
 
     this._setLayout(new qx.ui.layout.Grow());
     this.setAllowGrowX(true);
+    this.setAllowGrowY(true);
     this.setFocusable(true);
 
     this.__value = value ?? "";
@@ -30,6 +31,8 @@ class BsTextarea extends qx.ui.basic.Atom {
 
     this.__htmlTextarea = new qx.ui.embed.Html("");
     this.__htmlTextarea.setAllowGrowX(true);
+    this.__htmlTextarea.setAllowGrowY(true);
+    this.__htmlTextarea.setOverflowY("visible");
 
     this.__render();
     this._add(this.__htmlTextarea);

@@ -36,9 +36,12 @@ class BsSidebarAccount extends qx.ui.basic.Atom {
 
     this._setLayout(new qx.ui.layout.Grow());
     this.setAllowGrowX(true);
+    this.setAllowGrowY(true);
 
     this.__htmlButton = new qx.ui.embed.Html("");
     this.__htmlButton.setAllowGrowX(true);
+    this.__htmlButton.setAllowGrowY(true);
+    this.__htmlButton.setOverflowY("visible");
 
     this.__menuPopup = new qx.ui.popup.Popup(new qx.ui.layout.Grow());
     this.__menuPopup.setAutoHide(false);

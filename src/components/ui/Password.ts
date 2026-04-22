@@ -15,6 +15,7 @@ class BsPassword extends qx.ui.basic.Atom {
 
     this._setLayout(new qx.ui.layout.Grow());
     this.setAllowGrowX(true);
+    this.setAllowGrowY(true);
     this.setFocusable(true);
 
     this.__value = value ?? "";
@@ -23,6 +24,8 @@ class BsPassword extends qx.ui.basic.Atom {
 
     this.__htmlInput = new qx.ui.embed.Html("");
     this.__htmlInput.setAllowGrowX(true);
+    this.__htmlInput.setAllowGrowY(true);
+    this.__htmlInput.setOverflowY("visible");
 
     this.__render();
     this._add(this.__htmlInput);

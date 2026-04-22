@@ -33,6 +33,7 @@ class BsButton extends qx.ui.basic.Atom {
 
     this._setLayout(new qx.ui.layout.Grow());
     this.setAllowGrowX(true);
+    this.setAllowGrowY(true);
     this.setFocusable(true);
 
     this.__iconHtml = icon ? icon.getHtml() : "";
@@ -42,6 +43,8 @@ class BsButton extends qx.ui.basic.Atom {
     this.__size = options?.size ?? "default";
 
     this.__htmlButton = new qx.ui.embed.Html("");
+    this.__htmlButton.setAllowGrowY(true);
+    this.__htmlButton.setOverflowY("visible");
 
     this.__renderButton();
     this._add(this.__htmlButton);

@@ -24,6 +24,8 @@ class BsSeparator extends qx.ui.basic.Atom {
 
     this.__htmlSeparator = new qx.ui.embed.Html("");
     this.__htmlSeparator.setAllowGrowX(true);
+    this.__htmlSeparator.setAllowGrowY(true);
+    this.__htmlSeparator.setOverflowY("visible");
 
     this.__render();
     this._add(this.__htmlSeparator);
