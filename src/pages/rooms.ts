@@ -2,7 +2,7 @@
  * Rooms management page — CRUD for rooms.
  */
 class RoomsPage extends qx.ui.container.Composite {
-  private __table!: AgGridTable<RoomModel>;
+  private __table!: TableWidget<RoomModel>;
 
   constructor() {
     super(new qx.ui.layout.VBox(10));
@@ -27,7 +27,7 @@ class RoomsPage extends qx.ui.container.Composite {
     toolbar.add(refreshBtn);
     this.add(toolbar);
 
-    this.__table = new AgGridTable<RoomModel>(
+    this.__table = new TableWidget<RoomModel>(
       [
         { headerName: "ID", field: "id", hide: true },
         { headerName: "Name", field: "name", minWidth: 140, flex: 1 },

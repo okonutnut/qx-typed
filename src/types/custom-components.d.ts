@@ -52,6 +52,13 @@ interface BsPassword {
   onInput(handler: (value: string) => void): this;
 }
 
+interface BsOffcanvas {
+  open(): void;
+  close(): void;
+  toggle(): void;
+  isOpen(): boolean;
+}
+
 interface BsSelect {
   getSelectedValue(): string;
   setSelectedByLabel(label: string): this;

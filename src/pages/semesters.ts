@@ -2,7 +2,7 @@
  * Semesters management page — CRUD + set active semester.
  */
 class SemestersPage extends qx.ui.container.Composite {
-  private __table!: AgGridTable<SemesterModel>;
+  private __table!: TableWidget<SemesterModel>;
 
   constructor() {
     super(new qx.ui.layout.VBox(10));
@@ -27,7 +27,7 @@ class SemestersPage extends qx.ui.container.Composite {
     toolbar.add(refreshBtn);
     this.add(toolbar);
 
-    this.__table = new AgGridTable<SemesterModel>(
+    this.__table = new TableWidget<SemesterModel>(
       [
         { headerName: "ID", field: "id", hide: true },
         { headerName: "Name", field: "name", minWidth: 180, flex: 1 },

@@ -2,7 +2,7 @@
  * Faculty management page — CRUD for faculty members + subject assignments.
  */
 class FacultyPage extends qx.ui.container.Composite {
-  private __table!: AgGridTable<FacultyModel>;
+  private __table!: TableWidget<FacultyModel>;
 
   constructor() {
     super(new qx.ui.layout.VBox(10));
@@ -27,7 +27,7 @@ class FacultyPage extends qx.ui.container.Composite {
     toolbar.add(refreshBtn);
     this.add(toolbar);
 
-    this.__table = new AgGridTable<FacultyModel>(
+    this.__table = new TableWidget<FacultyModel>(
       [
         { headerName: "ID", field: "id", hide: true },
         {
