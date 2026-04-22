@@ -235,6 +235,8 @@ class Table<T> extends qx.ui.container.Composite {
   }
 
   private __updateTable(): void {
+    console.log("[Table] __updateTable called, filteredRows:", this.__filteredRows.length, "pageRows:", this.__filteredRows.length);
+    
     this.__totalPages = Math.max(1, Math.ceil(this.__filteredRows.length / this.__pageSize));
 
     const startIdx = (this.__currentPage - 1) * this.__pageSize;
@@ -242,11 +244,17 @@ class Table<T> extends qx.ui.container.Composite {
     const pageRows = this.__filteredRows.slice(startIdx, endIdx);
 
     const elem = (this.__tableContainer as any).getContentElement()?.getDomElement();
+    console.log("[Table] container element:", elem);
     if (elem) {
       this.__tableBody = elem.querySelector(".table-body") as HTMLElement;
+      console.log("[Table] tableBody:", this.__tableBody);
     }
 
-    if (!this.__tableBody) return;
+    if (!this.__tableBody) {
+      console.log("[Table] no tableBody, retrying...");
+      qx.event.Timer.once(() => this.__updateTable(), this, 200);
+      return;
+    }
 
     this.__tableBody.innerHTML = "";
 
@@ -301,6 +309,8 @@ class Table<T> extends qx.ui.container.Composite {
   }
 
   setRows(rows: T[]): void {
+    console.log("[Table] setRows called with", rows.length, "rows");
+    console.log("[Table] sample row:", rows[0]);
     this.__rows = rows.slice();
     this.__filteredRows = rows.slice();
     this.__currentPage = 1;
