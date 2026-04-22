@@ -49,11 +49,18 @@ class BsButton extends qx.ui.basic.Atom {
     this.__renderButton();
     this._add(this.__htmlButton);
 
-    this.__htmlButton.addListener("tap", () => this.fireEvent("execute"));
-
     this.__htmlButton.addListenerOnce("appear", () => {
+      const root = this.__htmlButton.getContentElement().getDomElement();
+      if (root) {
+        const wrapper = root.querySelector("div");
+        if (wrapper) {
+          (wrapper as HTMLElement).style.overflow = "visible";
+        }
+      }
       this.__bindNativeButton();
     });
+
+    this.__htmlButton.addListener("tap", () => this.fireEvent("execute"));
 
     this.addListener("focusin", () => this.__buttonEl?.focus());
     this.addListener("changeTabIndex", () => this.__syncTabIndex());
