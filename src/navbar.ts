@@ -29,7 +29,8 @@ class Navbar extends qx.ui.container.Composite {
       new InlineSvgIcon("menu", 16),
       { size: "icon", variant: "ghost", className: "btn-sm p-1" },
     );
-    collapseSidebarBtn.setWidth(50);
+    collapseSidebarBtn.setMinWidth(50);
+    collapseSidebarBtn.setAllowGrowX(true);
     collapseSidebarBtn.onClick(() => {
       this.fireEvent("toggleSidebar");
       if (onToggleSidebar) onToggleSidebar();
@@ -55,7 +56,8 @@ class Navbar extends qx.ui.container.Composite {
       new InlineSvgIcon("bell-off", 16),
       { size: "icon", variant: "ghost", className: "btn-sm p-1" },
     );
-    this.__notifyBtn.setWidth(50);
+    this.__notifyBtn.setMinWidth(50);
+    this.__notifyBtn.setAllowGrowX(true);
     this.__notifyBtn.onClick(async () => {
       const isSubscribed = await PushNotifier.isSubscribed();
       if (isSubscribed) {
@@ -79,7 +81,8 @@ class Navbar extends qx.ui.container.Composite {
       new InlineSvgIcon("ellipsis", 8),
       { size: "icon", variant: "ghost", className: "btn-sm p-1" },
     );
-    otherActionsBtn.setWidth(50);
+    otherActionsBtn.setMinWidth(50);
+    otherActionsBtn.setAllowGrowX(true);
     otherActionsBtn.onClick(() => this.__toggleActionsPopup(otherActionsBtn));
     this.add(otherActionsBtn);
 
