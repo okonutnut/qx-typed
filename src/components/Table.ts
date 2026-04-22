@@ -304,7 +304,12 @@ class Table<T> extends qx.ui.container.Composite {
     this.__rows = rows.slice();
     this.__filteredRows = rows.slice();
     this.__currentPage = 1;
-    this.__updateTable();
+
+    if (!this.__tableBody) {
+      qx.event.Timer.once(() => this.__updateTable(), this, 100);
+    } else {
+      this.__updateTable();
+    }
   }
 
   getSelectedRow(): T | null {
