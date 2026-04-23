@@ -4,6 +4,9 @@ type AGGridColumn = {
   width?: number;
   minWidth?: number;
   hide?: boolean;
+  editable?: boolean;
+  cellEditor?: string;
+  cellEditorParams?: any;
   valueGetter?: (params: any) => any;
   valueFormatter?: (params: any) => string;
   filter?: boolean | string;
@@ -26,6 +29,7 @@ class AGGrid<T> extends qx.ui.container.Composite {
   private __gridContainer!: qx.ui.embed.Html;
   private __gridApi: any = null;
   private __gridDivId: string;
+  private __onCellChange?: (row: any, field: string, newValue: any) => void;
 
   constructor(columns: AGGridColumn[], options?: AGGridOptions) {
     super(new qx.ui.layout.VBox(0));
@@ -77,6 +81,13 @@ class AGGrid<T> extends qx.ui.container.Composite {
 
       if (col.sortable !== false) colDef.sortable = true;
       if (col.resizable !== false) colDef.resizable = true;
+      if (col.editable) {
+        colDef.editable = col.editable;
+        if (col.cellEditor) {
+          colDef.cellEditor = col.cellEditor;
+          colDef.cellEditorParams = col.cellEditorParams;
+        }
+      }
 
       if (col.valueGetter) {
         colDef.valueGetter = col.valueGetter;
@@ -99,10 +110,20 @@ class AGGrid<T> extends qx.ui.container.Composite {
         sortable: true,
         resizable: true,
         filter: true,
+        editable: true,
       },
       onSelectionChanged: (event: any) => {
         const selectedRows = event.api.getSelectedRows();
         this.__selectedRow = selectedRows.length > 0 ? selectedRows[0] : null;
+      },
+      onCellValueChanged: (event: any) => {
+        const rowIndex = this.__rows.findIndex((r: any) => r.id === event.data.id);
+        if (rowIndex !== -1) {
+          this.__rows[rowIndex] = { ...event.data };
+        }
+        if (this.__onCellChange) {
+          this.__onCellChange(event.data, event.colDef.field, event.newValue);
+        }
       },
       onGridReady: (event: any) => {
         this.__gridApi = event.api;
@@ -135,5 +156,9 @@ class AGGrid<T> extends qx.ui.container.Composite {
     if (this.__gridApi) {
       this.__gridApi.setGridOption("rowData", this.__rows);
     }
+  }
+
+  onCellChange(handler: (row: any, field: string, newValue: any) => void): void {
+    this.__onCellChange = handler;
   }
 }

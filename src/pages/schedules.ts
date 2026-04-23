@@ -36,6 +36,14 @@ class SchedulesPage extends qx.ui.container.Composite {
       );
       addBtn.onClick(() => this.__showFormDialog());
       toolbar.add(addBtn);
+
+      const autoBtn = new BsButton(
+        "Auto-Schedule",
+        new InlineSvgIcon("sparkles", 16),
+        { size: "sm", variant: "default" },
+      );
+      autoBtn.onClick(() => showAutoSchedulerWindow());
+      toolbar.add(autoBtn);
     }
 
     const refreshBtn = new BsButton(
