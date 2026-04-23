@@ -17,9 +17,10 @@ class AutoSchedulerWindow extends qx.ui.window.Window {
   private __facultySubjects: FacultySubjectModel[] = [];
   private __faculty: FacultyModel[] = [];
   private __rooms: RoomModel[] = [];
+  private __semesters: SemesterModel[] = [];
   private __existingSchedules: ScheduleModel[] = [];
   private __proposedSchedules: ProposedSchedule[] = [];
-  private __table!: AGGrid<ProposedSchedule>;
+  private __table!: Table<ProposedSchedule>;
   private __loadingLabel!: qx.ui.basic.Label;
   private __isGenerating: boolean = false;
 
@@ -48,33 +49,17 @@ class AutoSchedulerWindow extends qx.ui.window.Window {
     this.__loadingLabel = new qx.ui.basic.Label("Generating schedule...");
     this.add(this.__loadingLabel);
 
-    this.__table = new AGGrid<ProposedSchedule>(
-      [
-        { headerName: "ID", field: "id", hide: true },
-        { headerName: "Subject Code", field: "subjectCode", width: 100 },
-        { headerName: "Subject Name", field: "subjectName", minWidth: 150 },
-        { headerName: "Faculty", field: "facultyName", minWidth: 150 },
-        { headerName: "Room", field: "roomName", width: 100 },
-        { headerName: "Building", field: "building", width: 100 },
-        {
-          headerName: "Day",
-          field: "day",
-          width: 100,
-          editable: true,
-          cellEditor: "agSelectCellEditor",
-          cellEditorParams: { values: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"] },
-        },
-        { headerName: "Start", field: "startTime", width: 80, editable: true, cellEditor: "agTimeCellEditor" },
-        { headerName: "End", field: "endTime", width: 80, editable: true, cellEditor: "agTimeCellEditor" },
-      ],
-      { emptyMessage: "Generating..." },
-    );
-    this.__table.onCellChange((row, field, newValue) => {
-      const index = this.__proposedSchedules.findIndex((s) => s.id === row.id);
-      if (index !== -1) {
-        (this.__proposedSchedules[index] as any)[field] = newValue;
-      }
-    });
+    this.__table = new Table<ProposedSchedule>([
+      { headerName: "ID", field: "id", hide: true },
+      { headerName: "Subject Code", field: "subjectCode", width: 120 },
+      { headerName: "Subject Name", field: "subjectName", width: 180 },
+      { headerName: "Faculty", field: "facultyName", width: 150 },
+      { headerName: "Room", field: "roomName", width: 100 },
+      { headerName: "Building", field: "building", width: 100 },
+      { headerName: "Day", field: "day", width: 100 },
+      { headerName: "Start", field: "startTime", width: 80 },
+      { headerName: "End", field: "endTime", width: 80 },
+    ]);
     this.add(this.__table, { flex: 1 });
 
     const actionBar = new qx.ui.container.Composite(new qx.ui.layout.HBox(8));
@@ -106,22 +91,34 @@ class AutoSchedulerWindow extends qx.ui.window.Window {
   }
 
   private async __loadData(): Promise<void> {
-    const [subjectsResult, facultySubjectsResult, facultyResult, roomsResult, schedulesResult] =
+    const [subjectsResult, facultySubjectsResult, facultyResult, roomsResult, schedulesResult, semestersResult] =
       await Promise.all([
         Api.Queries.subjects(),
         Api.Queries.facultySubjects(),
         Api.Queries.faculties(),
         Api.Queries.rooms(),
         Api.Queries.schedules(),
+        Api.Queries.semesters(),
       ]);
 
     this.__subjects = subjectsResult.subjects;
     this.__facultySubjects = facultySubjectsResult.facultySubjects;
     this.__faculty = facultyResult.faculties;
     this.__rooms = roomsResult.rooms;
+    this.__semesters = semestersResult.semesters;
     this.__existingSchedules = schedulesResult.schedules;
 
+    this.__filterByActiveSemester();
     this.__generateSchedules();
+  }
+
+  private __filterByActiveSemester(): void {
+    const active = this.__semesters.find((s) => s.isActive);
+    if (active) {
+      this.__existingSchedules = this.__existingSchedules.filter(
+        (s) => s.semesterId === active.id,
+      );
+    }
   }
 
   private __generateSchedules(): void {
@@ -142,10 +139,10 @@ class AutoSchedulerWindow extends qx.ui.window.Window {
 
       this.__table.setRows(this.__proposedSchedules);
 
-      const successCount = this.__proposedSchedules.length;
-      const totalCount = this.__subjects.length;
-      if (successCount < totalCount) {
-        BsToast.info(`${successCount} of ${totalCount} subjects scheduled`);
+      const scheduled = this.__proposedSchedules.length;
+      const total = this.__subjects.length - this.__existingSchedules.length;
+      if (scheduled < total) {
+        BsToast.info(`${scheduled} of ${total} unscheduled subjects scheduled`);
       }
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Failed to generate schedule";

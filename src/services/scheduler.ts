@@ -103,7 +103,8 @@ function generate(params: AISchedulerParams): ProposedSchedule[] {
     }
   }
 
-  const subjectsToSchedule = [...params.subjects];
+  const subjectIdsWithSchedules = new Set(params.existingSchedules.map((s) => s.subjectId));
+  const subjectsToSchedule = params.subjects.filter((s) => !subjectIdsWithSchedules.has(s.id));
   const sortByUnits = (a: SubjectModel, b: SubjectModel) => b.units - a.units;
   subjectsToSchedule.sort(sortByUnits);
 
@@ -112,53 +113,54 @@ function generate(params: AISchedulerParams): ProposedSchedule[] {
     if (eligibleFaculty.length === 0) {
       continue;
     }
-    const fac = eligibleFaculty[0];
     let scheduled = false;
 
-    for (const day of DAYS) {
-      for (let hour = START_HOUR; hour < END_HOUR; hour++) {
-        const startTime = minutesToTime(hour * 60);
-        const durationHours = subject.units * HOUR_DURATION;
-        const endMinutes = hour * 60 + durationHours * 60;
-        if (endMinutes > END_HOUR * 60) continue;
-        const endTime = minutesToTime(endMinutes);
+    for (const fac of eligibleFaculty) {
+      if (scheduled) break;
+      for (const day of DAYS) {
+        if (scheduled) break;
+        for (let hour = START_HOUR; hour < END_HOUR; hour++) {
+          const startTime = minutesToTime(hour * 60);
+          const durationHours = subject.units * HOUR_DURATION;
+          const endMinutes = hour * 60 + durationHours * 60;
+          if (endMinutes > END_HOUR * 60) continue;
+          const endTime = minutesToTime(endMinutes);
 
-        for (const room of params.rooms) {
-          const facId = fac.id;
-          const roomId = room.id;
+          for (const room of params.rooms) {
+            const facId = fac.id;
+            const roomId = room.id;
 
-          if (
-            !hasConflict(
-              proposed,
-              params.existingSchedules,
-              day,
-              startTime,
-              endTime,
-              facId,
-              roomId,
-              facultyMap,
-              roomMap,
-            )
-          ) {
-            proposed.push({
-              subjectCode: subject.code,
-              subjectName: subject.name,
-              facultyName: fac.fullName,
-              employeeId: fac.employeeId,
-              roomName: room.name,
-              building: room.building,
-              day: day,
-              startTime: startTime,
-              endTime: endTime,
-              units: subject.units,
-            });
-            scheduled = true;
-            break;
+            if (
+              !hasConflict(
+                proposed,
+                params.existingSchedules,
+                day,
+                startTime,
+                endTime,
+                facId,
+                roomId,
+                facultyMap,
+                roomMap,
+              )
+            ) {
+              proposed.push({
+                subjectCode: subject.code,
+                subjectName: subject.name,
+                facultyName: fac.fullName,
+                employeeId: fac.employeeId,
+                roomName: room.name,
+                building: room.building,
+                day: day,
+                startTime: startTime,
+                endTime: endTime,
+                units: subject.units,
+              });
+              scheduled = true;
+              break;
+            }
           }
         }
-        if (scheduled) break;
       }
-      if (scheduled) break;
     }
   }
 
